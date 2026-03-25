@@ -57,6 +57,7 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     answer: str
     code: str = ""
+    chart: ChartSpec | None = None
     images: list[str] = []
     error: str | None = None
     artifact: ArtifactMeta | None = None
@@ -118,7 +119,7 @@ def _extract_tool_code(args: str | dict | None) -> str:
 
 async def _persist_response(
     conv_id: uuid.UUID, question: str, answer_text: str,
-    code: str, images: list[str], artifact: ArtifactMeta | None,
+    code: str, images: list[str], chart: dict | None, artifact: ArtifactMeta | None,
     history: list[dict],
 ) -> None:
     """Persist user msg, assistant msg, artifact version, and update title."""
@@ -126,13 +127,13 @@ async def _persist_response(
     await db.save_message(
         conv_id, "assistant", answer_text,
         code=code or None, images=images or None,
-        artifact=artifact.model_dump() if artifact else None,
+        chart=chart, artifact=artifact.model_dump() if artifact else None,
     )
     if artifact:
         version = await db.next_artifact_version(conv_id, artifact.id)
         await db.save_artifact(
             conv_id, artifact.id, artifact.title, artifact.type, version,
-            code=code or None, images=images or None,
+            code=code or None, images=images or None, chart=chart,
         )
     if not history:
         await db.update_conversation_title(conv_id, question[:50])
@@ -162,22 +163,29 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
 
         code = ""
         images: list[str] = []
+        chart = None
         for r in deps.results:
             if r.code:
                 code = r.code
             if r.images:
                 images.extend(r.images)
+            if r.chart is not None and chart is None:
+                try:
+                    chart = ChartSpec(**r.chart)
+                except Exception:
+                    pass  # invalid spec, fall back to images
 
         existing_ids = {d["artifact_id"] for d in artifact_descriptors}
         answer_text, artifact = _parse_artifact(result.output, existing_ids)
 
-        if artifact is None and images:
+        if artifact is None and (images or chart):
             artifact = ArtifactMeta(id=f"artifact-{uuid.uuid4().hex[:8]}", title="Chart", type="chart", action="create")
 
-        await _persist_response(conv_id, req.question, answer_text, code, images, artifact, history)
+        chart_dict = chart.model_dump() if chart else None
+        await _persist_response(conv_id, req.question, answer_text, code, images, chart_dict, artifact, history)
 
         return QueryResponse(
-            answer=answer_text, code=code, images=images,
+            answer=answer_text, code=code, chart=chart, images=images,
             artifact=artifact, conversation_id=str(conv_id),
         )
     except Exception as e:
@@ -247,26 +255,34 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
                 elif isinstance(event, AgentRunResultEvent):
                     code = ""
                     images: list[str] = []
+                    chart_dict = None
                     for r in deps.results:
                         if r.code:
                             code = r.code
                         if r.images:
                             images.extend(r.images)
+                        if r.chart is not None and chart_dict is None:
+                            try:
+                                ChartSpec(**r.chart)  # validate
+                                chart_dict = r.chart
+                            except Exception:
+                                pass
 
                     existing_ids = {d["artifact_id"] for d in artifact_descriptors}
                     answer_text, artifact = _parse_artifact(full_text, existing_ids)
 
-                    if artifact is None and images:
+                    if artifact is None and (images or chart_dict):
                         artifact = ArtifactMeta(id=f"artifact-{uuid.uuid4().hex[:8]}", title="Chart", type="chart", action="create")
 
                     yield _sse_event({
                         "type": "done",
-                        "answer": answer_text, "code": code, "images": images,
+                        "answer": answer_text, "code": code,
+                        "chart": chart_dict, "images": images,
                         "artifact": artifact.model_dump() if artifact else None,
                         "error": None, "conversation_id": str(conv_id),
                     })
 
-                    await _persist_response(conv_id, req.question, answer_text, code, images, artifact, history)
+                    await _persist_response(conv_id, req.question, answer_text, code, images, chart_dict, artifact, history)
 
         except Exception as e:
             yield _sse_event({

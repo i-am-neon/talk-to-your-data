@@ -6,14 +6,15 @@ import asyncpg
 
 _pool: asyncpg.Pool | None = None
 
-MIGRATION_PATH = Path(__file__).resolve().parent.parent / "migrations" / "001_create_tables.sql"
+MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
 
 
 async def init_pool(database_url: str) -> None:
     global _pool
     _pool = await asyncpg.create_pool(database_url)
     async with _pool.acquire() as conn:
-        await conn.execute(MIGRATION_PATH.read_text())
+        for sql_file in sorted(MIGRATIONS_DIR.glob("*.sql")):
+            await conn.execute(sql_file.read_text())
 
 
 async def close_pool() -> None:
@@ -67,11 +68,11 @@ async def get_conversation(conversation_id: uuid.UUID, session_id: uuid.UUID) ->
         if not conv:
             return None
         messages = await conn.fetch(
-            "SELECT id, role, content, code, images, artifact, created_at FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC",
+            "SELECT id, role, content, code, images, chart, artifact, created_at FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC",
             conversation_id,
         )
         artifacts = await conn.fetch(
-            "SELECT id, artifact_id, title, type, version, code, images, created_at FROM artifacts WHERE conversation_id = $1 ORDER BY artifact_id, version ASC",
+            "SELECT id, artifact_id, title, type, version, code, images, chart, created_at FROM artifacts WHERE conversation_id = $1 ORDER BY artifact_id, version ASC",
             conversation_id,
         )
         return {
@@ -108,16 +109,18 @@ async def touch_conversation(conversation_id: uuid.UUID) -> None:
 
 async def save_message(
     conversation_id: uuid.UUID, role: str, content: str,
-    code: str | None = None, images: list[str] | None = None, artifact: dict | None = None,
+    code: str | None = None, images: list[str] | None = None,
+    chart: dict | None = None, artifact: dict | None = None,
 ) -> dict:
     pool = _get_pool()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO messages (conversation_id, role, content, code, images, artifact)
-               VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
-               RETURNING id, role, content, code, images, artifact, created_at""",
+            """INSERT INTO messages (conversation_id, role, content, code, images, chart, artifact)
+               VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7::jsonb)
+               RETURNING id, role, content, code, images, chart, artifact, created_at""",
             conversation_id, role, content, code,
             json.dumps(images) if images else None,
+            json.dumps(chart) if chart else None,
             json.dumps(artifact) if artifact else None,
         )
         return _row_to_dict(row)
@@ -135,16 +138,17 @@ async def get_message_history(conversation_id: uuid.UUID) -> list[dict]:
 
 async def save_artifact(
     conversation_id: uuid.UUID, artifact_id: str, title: str, type: str, version: int,
-    code: str | None = None, images: list[str] | None = None,
+    code: str | None = None, images: list[str] | None = None, chart: dict | None = None,
 ) -> dict:
     pool = _get_pool()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO artifacts (conversation_id, artifact_id, title, type, version, code, images)
-               VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
-               RETURNING id, artifact_id, title, type, version, code, images, created_at""",
+            """INSERT INTO artifacts (conversation_id, artifact_id, title, type, version, code, images, chart)
+               VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb)
+               RETURNING id, artifact_id, title, type, version, code, images, chart, created_at""",
             conversation_id, artifact_id, title, type, version, code,
             json.dumps(images) if images else None,
+            json.dumps(chart) if chart else None,
         )
         return _row_to_dict(row)
 
@@ -173,7 +177,7 @@ async def next_artifact_version(conversation_id: uuid.UUID, artifact_id: str) ->
 
 def _row_to_dict(row: asyncpg.Record) -> dict:
     d = dict(row)
-    for key in ("images", "artifact"):
+    for key in ("images", "chart", "artifact"):
         if key in d and isinstance(d[key], str):
             d[key] = json.loads(d[key])
     return d

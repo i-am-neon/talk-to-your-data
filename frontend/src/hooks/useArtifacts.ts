@@ -61,6 +61,7 @@ export function useArtifacts() {
       group.versions.push({
         content: "",
         code: a.code || undefined,
+        chart: a.chart || undefined,
         images: a.images || undefined,
         timestamp: new Date(a.created_at).getTime(),
       });

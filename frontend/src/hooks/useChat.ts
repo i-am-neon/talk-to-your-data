@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import type { Message, ArtifactMeta, ModelOption, StreamEvent } from "../types";
+import type { Message, ArtifactMeta, ModelOption, StreamEvent, ChartSpec } from "../types";
 import { queryAgentStream, getConversation } from "../lib/api";
 
 interface ArtifactHandlers {
   getDescriptors: () => { id: string; title: string; type: string }[];
-  processArtifact: (meta: ArtifactMeta, content: { answer: string; code?: string; images?: string[] }) => void;
+  processArtifact: (meta: ArtifactMeta, content: { answer: string; code?: string; chart?: ChartSpec; images?: string[] }) => void;
   loadFromConversation: (artifacts: any[]) => void;
 }
 
@@ -36,6 +36,7 @@ export function useChat(
           role: m.role,
           content: m.content,
           code: m.code || undefined,
+          chart: m.chart || undefined,
           images: m.images || undefined,
           artifactId: m.artifact?.id,
         }));
@@ -136,6 +137,7 @@ export function useChat(
               ...msg,
               content: event.answer ?? msg.content,
               code: event.artifact ? undefined : event.code || undefined,
+              chart: event.artifact ? undefined : (event.chart ?? undefined),
               images: event.artifact
                 ? undefined
                 : event.images.length > 0
@@ -151,6 +153,7 @@ export function useChat(
             artifactHandlers.processArtifact(event.artifact, {
               answer: event.answer ?? "",
               code: event.code || undefined,
+              chart: event.chart ?? undefined,
               images: event.images.length > 0 ? event.images : undefined,
             });
           }

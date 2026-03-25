@@ -55,6 +55,7 @@ export interface QueryRequest {
 export interface QueryResponse {
   answer: string;
   code: string;
+  chart: ChartSpec | null;
   images: string[];
   error: string | null;
   artifact: ArtifactMeta | null;
@@ -75,6 +76,7 @@ export interface ConversationDetail extends ConversationSummary {
     content: string;
     code: string | null;
     images: string[] | null;
+    chart: ChartSpec | null;
     artifact: ArtifactMeta | null;
     created_at: string;
   }[];
@@ -86,6 +88,7 @@ export interface ConversationDetail extends ConversationSummary {
     version: number;
     code: string | null;
     images: string[] | null;
+    chart: ChartSpec | null;
     created_at: string;
   }[];
 }
@@ -109,6 +112,7 @@ export type StreamEvent =
       type: "done";
       answer: string;
       code: string;
+      chart: ChartSpec | null;
       images: string[];
       artifact: ArtifactMeta | null;
       error: string | null;
