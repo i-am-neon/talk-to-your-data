@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     e2b_api_key: str
     logfire_token: str = ""
     frontend_url: str = "*"
+    database_url: str = ""
 
     model_config = {"env_file": ".env"}
 

@@ -1,9 +1,23 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.query import router
+from app import db
+from app.config import settings
+from app.routes.query import router as query_router
+from app.routes.conversations import router as conversations_router
 
-app = FastAPI(title="Data Agent API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if settings.database_url:
+        await db.init_pool(settings.database_url)
+    yield
+    await db.close_pool()
+
+
+app = FastAPI(title="Data Agent API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -13,8 +27,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-app.include_router(router)
+app.include_router(query_router)
+app.include_router(conversations_router)
 
 
 @app.get("/health")

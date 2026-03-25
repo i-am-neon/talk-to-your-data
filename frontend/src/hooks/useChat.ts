@@ -1,67 +1,192 @@
-import { useState, useRef, useCallback } from "react";
-import type { Message, ArtifactMeta } from "../types";
-import { queryAgent } from "../lib/api";
+import { useState, useRef, useCallback, useEffect } from "react";
+import type { Message, ArtifactMeta, ModelOption, StreamEvent } from "../types";
+import { queryAgentStream, getConversation } from "../lib/api";
 
 interface ArtifactHandlers {
   getDescriptors: () => { id: string; title: string; type: string }[];
   processArtifact: (meta: ArtifactMeta, content: { answer: string; code?: string; images?: string[] }) => void;
+  loadFromConversation: (artifacts: any[]) => void;
 }
 
-export function useChat(artifactHandlers: ArtifactHandlers) {
+export function useChat(
+  artifactHandlers: ArtifactHandlers,
+  model: ModelOption,
+  conversationId: string | null,
+  onConversationUpdate: () => void,
+) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesRef = useRef(messages);
-  messagesRef.current = messages;
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const sendMessage = useCallback(async (question: string) => {
-    const userMessage: Message = { role: "user", content: question };
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
+  const lastWasErrorRef = useRef(false);
 
-    try {
-      const history = messagesRef.current.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
+  useEffect(() => {
+    if (!conversationId) {
+      setMessages([]);
+      return;
+    }
 
-      const response = await queryAgent({
-        question,
-        history,
-        artifacts: artifactHandlers.getDescriptors(),
+    let cancelled = false;
+    setIsLoadingHistory(true);
+
+    getConversation(conversationId)
+      .then((conv) => {
+        if (cancelled) return;
+        const loaded: Message[] = conv.messages.map((m) => ({
+          role: m.role,
+          content: m.content,
+          code: m.code || undefined,
+          images: m.images || undefined,
+          artifactId: m.artifact?.id,
+        }));
+        setMessages(loaded);
+        artifactHandlers.loadFromConversation(conv.artifacts);
+      })
+      .catch((err) => {
+        if (!cancelled) console.error("Failed to load conversation:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingHistory(false);
       });
 
-      // If there's an artifact, route images/code to the artifact instead of inline
-      const hasArtifact = response.artifact != null;
+    return () => { cancelled = true; };
+  }, [conversationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: response.answer,
-        code: hasArtifact ? undefined : (response.code || undefined),
-        images: hasArtifact ? undefined : (response.images.length > 0 ? response.images : undefined),
-        error: response.error || undefined,
-        artifactId: response.artifact?.id,
-      };
-
-      if (response.artifact) {
-        artifactHandlers.processArtifact(response.artifact, {
-          answer: response.answer,
-          code: response.code || undefined,
-          images: response.images.length > 0 ? response.images : undefined,
-        });
+  const updateLastMessage = useCallback((updater: (msg: Message) => Message) => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      const last = updated[updated.length - 1];
+      if (last && last.role === "assistant") {
+        updated[updated.length - 1] = updater(last);
       }
+      return updated;
+    });
+  }, []);
 
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (err) {
-      const errorMessage: Message = {
-        role: "assistant",
-        content: "",
-        error: err instanceof Error ? err.message : "Something went wrong",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [artifactHandlers]);
+  const handleEvent = useCallback(
+    (event: StreamEvent) => {
+      switch (event.type) {
+        case "thinking": {
+          updateLastMessage((msg) => {
+            const steps = [...(msg.steps ?? [])];
+            const last = steps[steps.length - 1];
 
-  return { messages, isLoading, sendMessage };
+            if (lastWasErrorRef.current) {
+              steps.push({ type: "retry", content: event.content });
+              lastWasErrorRef.current = false;
+            } else if (last && (last.type === "thinking" || last.type === "retry")) {
+              steps[steps.length - 1] = { ...last, content: last.content + event.content };
+            } else {
+              steps.push({ type: "thinking", content: event.content });
+            }
+
+            return { ...msg, steps };
+          });
+          break;
+        }
+
+        case "tool_call_start": {
+          const firstLine = event.code.split("\n")[0];
+          updateLastMessage((msg) => ({
+            ...msg,
+            steps: [
+              ...(msg.steps ?? []),
+              { type: "code", content: firstLine, fullCode: event.code },
+            ],
+          }));
+          break;
+        }
+
+        case "tool_result": {
+          const desc = event.stdout
+            ? event.stdout.slice(0, 80) + (event.stdout.length > 80 ? "..." : "")
+            : "Code executed";
+          updateLastMessage((msg) => ({
+            ...msg,
+            steps: [
+              ...(msg.steps ?? []),
+              { type: "result", content: desc, chartsCount: event.charts_count },
+            ],
+          }));
+          break;
+        }
+
+        case "tool_error": {
+          lastWasErrorRef.current = true;
+          updateLastMessage((msg) => ({
+            ...msg,
+            steps: [...(msg.steps ?? []), { type: "error", content: event.error }],
+          }));
+          break;
+        }
+
+        case "text_delta": {
+          updateLastMessage((msg) => ({
+            ...msg,
+            content: msg.content + event.content,
+          }));
+          break;
+        }
+
+        case "done": {
+          lastWasErrorRef.current = false;
+
+          updateLastMessage((msg) => {
+            const updated: Message = {
+              ...msg,
+              content: event.answer ?? msg.content,
+              code: event.artifact ? undefined : event.code || undefined,
+              images: event.artifact
+                ? undefined
+                : event.images.length > 0
+                  ? event.images
+                  : undefined,
+              error: event.error || undefined,
+              artifactId: event.artifact?.id,
+            };
+            return updated;
+          });
+
+          if (event.artifact) {
+            artifactHandlers.processArtifact(event.artifact, {
+              answer: event.answer ?? "",
+              code: event.code || undefined,
+              images: event.images.length > 0 ? event.images : undefined,
+            });
+          }
+
+          onConversationUpdate();
+          setIsStreaming(false);
+          break;
+        }
+      }
+    },
+    [updateLastMessage, artifactHandlers, onConversationUpdate]
+  );
+
+  const sendMessage = useCallback(
+    (question: string, overrideConversationId?: string) => {
+      const convId = overrideConversationId || conversationId;
+      if (!convId) return;
+
+      const userMessage: Message = { role: "user", content: question };
+      const assistantMessage: Message = { role: "assistant", content: "", steps: [] };
+
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+      setIsStreaming(true);
+      lastWasErrorRef.current = false;
+
+      queryAgentStream(
+        {
+          question,
+          conversation_id: convId,
+          model,
+        },
+        handleEvent
+      );
+    },
+    [conversationId, model, handleEvent]
+  );
+
+  return { messages, isStreaming, isLoadingHistory, sendMessage };
 }

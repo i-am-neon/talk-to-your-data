@@ -11,6 +11,7 @@ dependencies = [
     "e2b-code-interpreter>=1.2",
     "pydantic-settings>=2.7",
     "pandas>=2.2",
+    "asyncpg>=0.30",
 ]
 
 [dependency-groups]
@@ -20,3 +21,8 @@ dev = [
     "httpx>=0.28",
     "pydantic-evals>=1.0",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"

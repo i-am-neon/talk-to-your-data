@@ -18,6 +18,10 @@ test:
 evals:
     cd backend && uv run pytest evals/ -v
 
+# Run database migrations
+migrate:
+    cd backend && psql "$DATABASE_URL" -f migrations/001_create_tables.sql
+
 # Install all dependencies
 install:
     cd backend && uv sync

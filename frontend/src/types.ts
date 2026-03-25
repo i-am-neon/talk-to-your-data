@@ -1,6 +1,19 @@
+export interface ChartSeries {
+  key: string;
+  label: string;
+}
+
+export interface ChartSpec {
+  type: "bar" | "line" | "area" | "pie" | "radar";
+  data: Record<string, unknown>[];
+  x_key: string;
+  series: ChartSeries[];
+}
+
 export interface ArtifactVersion {
   content: string; // answer text associated with this version
   code?: string;
+  chart?: ChartSpec;
   images?: string[];
   timestamp: number;
 }
@@ -24,15 +37,19 @@ export interface Message {
   role: "user" | "assistant";
   content: string;
   code?: string;
+  chart?: ChartSpec;
   images?: string[];
   error?: string;
   artifactId?: string; // links message to a workspace artifact
+  steps?: ThinkingStep[];
 }
+
+export type ModelOption = "sonnet" | "opus" | "haiku";
 
 export interface QueryRequest {
   question: string;
-  history: { role: "user" | "assistant"; content: string }[];
-  artifacts: { id: string; title: string; type: string }[];
+  conversation_id: string;
+  model: ModelOption;
 }
 
 export interface QueryResponse {
@@ -41,4 +58,58 @@ export interface QueryResponse {
   images: string[];
   error: string | null;
   artifact: ArtifactMeta | null;
+  conversation_id: string;
 }
+
+export interface ConversationSummary {
+  id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationDetail extends ConversationSummary {
+  messages: {
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+    code: string | null;
+    images: string[] | null;
+    artifact: ArtifactMeta | null;
+    created_at: string;
+  }[];
+  artifacts: {
+    id: string;
+    artifact_id: string;
+    title: string;
+    type: "chart" | "table" | "code";
+    version: number;
+    code: string | null;
+    images: string[] | null;
+    created_at: string;
+  }[];
+}
+
+// --- Streaming types ---
+
+export interface ThinkingStep {
+  type: "thinking" | "code" | "result" | "error" | "retry";
+  content: string;
+  fullCode?: string;
+  chartsCount?: number;
+}
+
+export type StreamEvent =
+  | { type: "thinking"; content: string }
+  | { type: "tool_call_start"; tool: string; code: string }
+  | { type: "tool_result"; stdout: string; images: string[]; charts_count: number }
+  | { type: "tool_error"; error: string }
+  | { type: "text_delta"; content: string }
+  | {
+      type: "done";
+      answer: string;
+      code: string;
+      images: string[];
+      artifact: ArtifactMeta | null;
+      error: string | null;
+    };

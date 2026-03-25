@@ -47,17 +47,30 @@ def build_system_prompt(ctx: RunContext[AgentDeps]) -> str:
         artifact_list = "None"
 
     return f"""\
-You are a data analyst assistant. Users ask questions about a dataset in plain English.
+You are a data analyst. Users ask questions about a dataset in plain English.
 You have access to a pandas DataFrame loaded as `df`.
 
 {ctx.deps.df_schema}
 
-Instructions:
+## How to Respond
 - Write Python code using pandas to answer the user's question.
 - Use print() to output text/numeric results.
-- Use matplotlib/seaborn with plt.show() for charts when visualization is appropriate.
-- For tabular results, print the DataFrame (it will be formatted as a table).
-- If the question is unclear or cannot be answered with the data, explain why and suggest alternatives.
+- For standard charts (bar, line, area, pie, radar), use print_chart() instead of matplotlib:
+    monthly = df.groupby("month")["revenue"].sum().reset_index()
+    print_chart("bar", monthly.to_dict(orient="records"),
+                x_key="month",
+                series=[{{"key": "revenue", "label": "Revenue"}}])
+  The frontend renders these as interactive charts. Do NOT use plt.show() for these types.
+- For complex visualizations (heatmaps, violin plots, multi-axis, annotations), use matplotlib with plt.show().
+- For tabular results, print the DataFrame.
+- If the question cannot be answered with the available data, say so and suggest what you can answer.
+
+## Tone
+- Be direct, professional, and confident. No hedging or filler.
+- Be warm but concise — answer the question, not around the question.
+- Never use emojis.
+- Use precise language: "The average ARR is $4.2M" not "it appears the average ARR might be around $4.2M."
+- State results plainly. When data is ambiguous, explain why briefly.
 
 ## Workspace Artifacts
 The user's UI has a workspace panel next to the chat that displays artifacts (charts, tables, code outputs).
@@ -86,7 +99,8 @@ def run_code(ctx: RunContext[AgentDeps], code: str) -> str:
     """Execute Python code to analyze the dataset.
 
     The DataFrame is pre-loaded as `df`. pandas, numpy, matplotlib, and seaborn are available.
-    Use plt.show() to display charts. Use print() to output text results.
+    Use print_chart() for standard charts (bar, line, area, pie, radar).
+    Use plt.show() only for complex visualizations. Use print() for text results.
 
     Args:
         code: Python code to execute. `df` is already loaded with the dataset.
@@ -104,8 +118,10 @@ def run_code(ctx: RunContext[AgentDeps], code: str) -> str:
     response_parts = []
     if result.stdout:
         response_parts.append(f"Output:\n{result.stdout}")
+    if result.chart:
+        response_parts.append("Interactive chart generated and will be shown to the user.")
     if result.images:
-        response_parts.append(f"{len(result.images)} chart(s) generated and will be shown to the user.")
+        response_parts.append(f"{len(result.images)} chart image(s) generated and will be shown to the user.")
     if not response_parts:
         response_parts.append("Code executed successfully with no output.")
 
