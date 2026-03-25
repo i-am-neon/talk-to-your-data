@@ -19,10 +19,25 @@ export function useChat(
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const lastWasErrorRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
+  const skipHistoryRef = useRef(false);
 
   useEffect(() => {
+    // Abort any active stream when conversation changes
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+      setIsStreaming(false);
+    }
+
     if (!conversationId) {
       setMessages([]);
+      return;
+    }
+
+    // Skip history load when sendMessage just created this conversation
+    if (skipHistoryRef.current) {
+      skipHistoryRef.current = false;
       return;
     }
 
@@ -173,6 +188,18 @@ export function useChat(
       const convId = overrideConversationId || conversationId;
       if (!convId) return;
 
+      // Abort any in-flight stream
+      if (abortRef.current) {
+        abortRef.current.abort();
+        abortRef.current = null;
+      }
+
+      // If we're being called with a just-created conversation id,
+      // prevent the history-load effect from racing with us
+      if (overrideConversationId) {
+        skipHistoryRef.current = true;
+      }
+
       const userMessage: Message = { role: "user", content: question };
       const assistantMessage: Message = { role: "assistant", content: "", steps: [] };
 
@@ -180,7 +207,7 @@ export function useChat(
       setIsStreaming(true);
       lastWasErrorRef.current = false;
 
-      queryAgentStream(
+      abortRef.current = queryAgentStream(
         {
           question,
           conversation_id: convId,
