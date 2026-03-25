@@ -149,6 +149,14 @@ function ErrorStep({ step }: { step: ThinkingStep }) {
 }
 
 function StepItem({ step, isActive }: { step: ThinkingStep; isActive?: boolean }) {
+  if (step.type === "thinking" || step.type === "retry") {
+    return (
+      <p className="text-muted-foreground text-xs leading-relaxed m-0 whitespace-pre-wrap">
+        {step.content}
+      </p>
+    );
+  }
+
   return (
     <div className="flex items-start gap-2 text-sm">
       <StepBadge type={step.type} isActive={isActive} />
@@ -161,47 +169,22 @@ function StepItem({ step, isActive }: { step: ThinkingStep; isActive?: boolean }
         </span>
       ) : step.type === "error" ? (
         <ErrorStep step={step} />
-      ) : (
-        <span className="text-muted-foreground text-xs leading-relaxed">
-          {step.content}
-        </span>
-      )}
+      ) : null}
     </div>
   );
 }
 
-function LiveHeader({ steps }: { steps: ThinkingStep[] }) {
+function LiveLabel({ steps }: { steps: ThinkingStep[] }) {
   const last = steps[steps.length - 1];
   if (!last) return null;
-
   const config = stepConfig[last.type];
-  const Icon = config.icon;
-
-  return (
-    <div className={`flex items-center gap-2 text-sm mb-2.5 ${config.color}`}>
-      <Icon size={14} className="animate-pulse" />
-      <span>{config.activeLabel}...</span>
-    </div>
-  );
+  return <span className="animate-pulse">{config.activeLabel}...</span>;
 }
 
 export function ThinkingSection({ steps, isStreaming }: ThinkingSectionProps) {
   const [expanded, setExpanded] = useState(false);
 
   if (steps.length === 0) return null;
-
-  if (isStreaming) {
-    return (
-      <div className="mb-1 bg-purple-500/5 border border-purple-500/10 rounded-xl px-4 py-3">
-        <LiveHeader steps={steps} />
-        <div className="ml-1 pl-4 border-l-2 border-purple-500/20 flex flex-col gap-2.5">
-          {steps.map((step, i) => (
-            <StepItem key={i} step={step} isActive={i === steps.length - 1} />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   const summary = buildSummary(steps);
 
@@ -211,8 +194,8 @@ export function ThinkingSection({ steps, isStreaming }: ThinkingSectionProps) {
         onClick={() => setExpanded(!expanded)}
         className="inline-flex items-center gap-1.5 bg-purple-500/8 border border-purple-500/15 rounded-lg px-3 py-1.5 text-sm text-purple-400 hover:bg-purple-500/12 transition-colors cursor-pointer"
       >
-        <Brain size={14} />
-        <span>{summary}</span>
+        <Brain size={14} className={isStreaming ? "animate-pulse" : ""} />
+        <span>{isStreaming ? <LiveLabel steps={steps} /> : summary}</span>
         <ChevronDown
           size={12}
           className={`transition-transform duration-250 ${expanded ? "rotate-180" : ""}`}
@@ -225,7 +208,7 @@ export function ThinkingSection({ steps, isStreaming }: ThinkingSectionProps) {
         <div className="overflow-hidden">
           <div className="mt-2 ml-1 pl-4 border-l-2 border-purple-500/20 flex flex-col gap-2.5">
             {steps.map((step, i) => (
-              <StepItem key={i} step={step} />
+              <StepItem key={i} step={step} isActive={isStreaming && i === steps.length - 1} />
             ))}
           </div>
         </div>

@@ -32,6 +32,7 @@ agent = Agent(
     model,
     deps_type=AgentDeps,
     retries=3,
+    model_settings={"extra_body": {"thinking": {"type": "enabled", "budget_tokens": 1024}}},
 )
 
 
