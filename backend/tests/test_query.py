@@ -1,5 +1,6 @@
 import uuid
 import pytest
+import httpx as _httpx
 from httpx import AsyncClient, ASGITransport
 from unittest.mock import patch, AsyncMock, MagicMock
 from app.main import app
@@ -126,3 +127,51 @@ async def test_query_auto_titles_conversation(client):
     conv = await db.get_conversation(uuid.UUID(conv_id), uuid.UUID(SESSION_ID))
     assert conv["title"] is not None
     assert len(conv["title"]) <= 50
+
+
+async def test_query_llm_timeout_returns_classified_error(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+
+    with patch("app.routes.query.agent.run", new_callable=AsyncMock, side_effect=_httpx.ReadTimeout("timed out")):
+        resp = await client.post(
+            "/api/query",
+            json={"question": "What is revenue?", "conversation_id": conv_id},
+            headers=HEADERS,
+        )
+
+    data = resp.json()
+    assert data["error_code"] == "llm_timeout"
+    assert "try again" in data["error"].lower()
+
+
+async def test_query_rate_limit_returns_classified_error(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+
+    response = _httpx.Response(429, request=_httpx.Request("POST", "http://test"))
+    exc = _httpx.HTTPStatusError("rate limited", request=response.request, response=response)
+
+    with patch("app.routes.query.agent.run", new_callable=AsyncMock, side_effect=exc):
+        resp = await client.post(
+            "/api/query",
+            json={"question": "What is revenue?", "conversation_id": conv_id},
+            headers=HEADERS,
+        )
+
+    data = resp.json()
+    assert data["error_code"] == "llm_rate_limited"
+    assert "busy" in data["error"].lower()
+
+
+async def test_query_generic_error_returns_internal(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+
+    with patch("app.routes.query.agent.run", new_callable=AsyncMock, side_effect=RuntimeError("unexpected")):
+        resp = await client.post(
+            "/api/query",
+            json={"question": "What is revenue?", "conversation_id": conv_id},
+            headers=HEADERS,
+        )
+
+    data = resp.json()
+    assert data["error_code"] == "internal_error"
+    assert "something went wrong" in data["error"].lower()

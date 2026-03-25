@@ -18,7 +18,7 @@ from pydantic_ai.messages import (
 from app.agent.agent import agent, AgentDeps, make_model
 from app import db
 from app.data.loader import load_dataset, get_schema_summary
-from app.errors import ErrorCode, USER_MESSAGES, MAX_QUESTION_LENGTH
+from app.errors import ErrorCode, USER_MESSAGES, MAX_QUESTION_LENGTH, classify_error
 
 router = APIRouter()
 
@@ -223,7 +223,11 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
             artifact=artifact, conversation_id=str(conv_id),
         )
     except Exception as e:
-        return QueryResponse(answer="", error=f"Unable to process your question: {str(e)}", conversation_id=str(conv_id))
+        error_code, error_msg = classify_error(e)
+        return QueryResponse(
+            answer="", error=error_msg, error_code=error_code,
+            conversation_id=str(conv_id),
+        )
 
 
 @router.post("/api/query/stream")
@@ -336,9 +340,10 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
                     )
 
         except Exception as e:
+            error_code, error_msg = classify_error(e)
             yield _sse_event({
                 "type": "done", "answer": "", "code": "", "images": [],
-                "artifact": None, "error": f"Unable to process your question: {str(e)}",
+                "artifact": None, "error": error_msg, "error_code": error_code,
                 "conversation_id": str(conv_id),
             })
 
