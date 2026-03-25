@@ -23,23 +23,29 @@ export function useChat(
   const skipHistoryRef = useRef(false);
 
   useEffect(() => {
-    // Abort any active stream when conversation changes
-    if (abortRef.current) {
-      abortRef.current.abort();
-      abortRef.current = null;
-      setIsStreaming(false);
-    }
-
     if (!conversationId) {
+      // Abort any active stream when clearing conversation
+      if (abortRef.current) {
+        abortRef.current.abort();
+        abortRef.current = null;
+        setIsStreaming(false);
+      }
       setMessages([]);
       artifactHandlers.loadFromConversation([]);
       return;
     }
 
-    // Skip history load when sendMessage just created this conversation
+    // Skip history load (and abort) when sendMessage just created this conversation
     if (skipHistoryRef.current) {
       skipHistoryRef.current = false;
       return;
+    }
+
+    // Abort any active stream when switching to a different conversation
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+      setIsStreaming(false);
     }
 
     // Clear stale state from previous conversation immediately
