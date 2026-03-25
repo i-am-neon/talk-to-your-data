@@ -40,7 +40,7 @@ agent = Agent(
 def build_system_prompt(ctx: RunContext[AgentDeps]) -> str:
     if ctx.deps.artifacts:
         artifact_list = "\n".join(
-            f'- {a["id"]}: "{a["title"]}" ({a["type"]})'
+            f'- {a["artifact_id"]}: "{a["title"]}" ({a["type"]})'
             for a in ctx.deps.artifacts
         )
     else:

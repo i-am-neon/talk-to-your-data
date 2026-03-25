@@ -79,7 +79,7 @@ class QueryResponse(BaseModel):
     conversation_id: str
 
 
-def _parse_artifact(text: str, existing_ids: set[str]) -> tuple[str, ArtifactMeta | None]:
+def _parse_artifact(text: str, existing_ids: set[str], existing_descriptors: list[dict] | None = None) -> tuple[str, ArtifactMeta | None]:
     match = ARTIFACT_PATTERN.search(text)
     if not match:
         return text, None
@@ -96,8 +96,17 @@ def _parse_artifact(text: str, existing_ids: set[str]) -> tuple[str, ArtifactMet
         title = match.group(3) or "Updated chart"
         art_type = match.group(4) or "chart"
         if artifact_id not in existing_ids:
-            action = "create"
-            artifact_id = f"artifact-{uuid.uuid4().hex[:8]}"
+            # LLM may use the title instead of the ID — try to resolve by title
+            resolved = False
+            if existing_descriptors:
+                for d in existing_descriptors:
+                    if d["title"] == artifact_id:
+                        artifact_id = d["artifact_id"]
+                        resolved = True
+                        break
+            if not resolved:
+                action = "create"
+                artifact_id = f"artifact-{uuid.uuid4().hex[:8]}"
 
     return clean_text, ArtifactMeta(id=artifact_id, title=title, type=art_type, action=action)
 
@@ -204,7 +213,7 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
                     pass
 
         existing_ids = {d["artifact_id"] for d in artifact_descriptors}
-        answer_text, artifact = _parse_artifact(result.output, existing_ids)
+        answer_text, artifact = _parse_artifact(result.output, existing_ids, artifact_descriptors)
 
         if artifact is None and table:
             table_title = next((r.table.get("title", "Table") for r in deps.results if r.table), "Table")
@@ -319,7 +328,7 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
                                     pass
 
                         existing_ids = {d["artifact_id"] for d in artifact_descriptors}
-                        answer_text, artifact = _parse_artifact(full_text, existing_ids)
+                        answer_text, artifact = _parse_artifact(full_text, existing_ids, artifact_descriptors)
 
                         if artifact is None and table_dict:
                             table_title = next((r.table.get("title", "Table") for r in deps.results if r.table), "Table")

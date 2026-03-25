@@ -56,6 +56,18 @@ def test_parse_artifact_update_bad_id():
     assert meta.id.startswith("artifact-")
 
 
+def test_parse_artifact_update_resolves_title_to_id():
+    """When LLM uses title instead of artifact ID, resolve via descriptors."""
+    descriptors = [{"artifact_id": "artifact-abc", "title": "My Chart", "type": "chart"}]
+    text = "Updated. [[artifact:update|My Chart|New Title|chart]]"
+    clean, meta = _parse_artifact(text, {"artifact-abc"}, descriptors)
+    assert clean == "Updated."
+    assert meta is not None
+    assert meta.action == "update"
+    assert meta.id == "artifact-abc"
+    assert meta.title == "New Title"
+
+
 async def test_health(client):
     resp = await client.get("/health")
     assert resp.status_code == 200
