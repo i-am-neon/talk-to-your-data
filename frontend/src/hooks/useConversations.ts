@@ -27,7 +27,7 @@ export function useConversations() {
     return conv.id;
   }, []);
 
-  const select = useCallback((id: string) => { setActiveId(id); }, []);
+  const select = useCallback((id: string | null) => { setActiveId(id); }, []);
 
   const remove = useCallback(async (id: string) => {
     await deleteConversation(id);

@@ -40,7 +40,7 @@ export default function App() {
   const bottomRef = useRef<HTMLDivElement>(null);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const handleNewChat = useCallback(async () => { await create(); }, [create]);
+  const handleNewChat = useCallback(() => { select(null); }, [select]);
 
   const handleSend = useCallback(async (question: string) => {
     let id = activeId;
