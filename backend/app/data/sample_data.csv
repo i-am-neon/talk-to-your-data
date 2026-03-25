@@ -1,0 +1,501 @@
+company_name,industry_vertical,founding_year,arr_thousands,employee_count,churn_rate_percent,yoy_growth_rate_percent
+SignalTech,Fintech,2021,816,5,11.3,136.0
+VertexSync,Retail,2010,1333,21,2.3,23.9
+TerraBase,Retail,2013,2913,6,11.9,21.2
+ForgeIO,Marketing Tech,2012,1982,14,6.7,34.1
+ScaleLabs,Media,2018,1165,23,10.2,72.0
+BoltSync,Real Estate,2021,512,5,13.6,132.6
+CipherLogic,Media,2020,1020,19,5.5,75.6
+TerraSystems,Telecom,2020,1267,14,5.5,74.8
+WaveBase,EdTech,2020,720,19,6.1,54.8
+OmniSync,Insurance,2013,2864,25,8.0,28.5
+PulseBase,Agriculture,2014,3009,18,6.7,79.8
+EdgeFlow,Travel,2011,1366,8,12.3,39.6
+ApexApp,Logistics,2019,1606,25,14.3,57.6
+CoreBase,Marketing Tech,2022,853,5,8.9,144.0
+YieldLogic,Energy,2022,736,5,13.9,86.0
+NexusSoftware,Manufacturing,2022,1189,15,7.2,11.4
+BoltOps,EdTech,2010,3128,39,12.6,78.5
+MatrixSoftware,Cybersecurity,2020,1362,29,9.9,77.5
+MatrixCloud,Legal Tech,2016,2096,15,3.6,25.7
+BaseAI,Construction,2018,1742,33,10.2,26.0
+CloudIO,E-commerce,2018,1465,7,11.4,71.8
+OrbitStack,EdTech,2022,898,20,8.6,75.1
+HarborLabs,HR Tech,2010,2357,17,9.0,19.8
+MetaLogic,Media,2013,2557,37,15.0,68.5
+VertexData,Supply Chain,2016,2023,29,2.8,36.5
+HarborOps,Retail,2021,1640,15,5.3,14.1
+ZenBase,Healthcare,2021,467,9,14.5,89.0
+DataFlow,E-commerce,2023,298,5,8.7,142.4
+OrbitData,Construction,2019,869,13,8.8,141.5
+OmniIO,EdTech,2014,1422,29,11.8,15.1
+HarborMind,Construction,2011,2873,14,14.1,71.7
+PulseHQ,Legal Tech,2012,2990,34,10.5,10.5
+NeonOps,HR Tech,2024,303,14,11.2,55.4
+QuestCloud,Insurance,2013,2272,34,13.8,13.6
+SignalHub,Marketing Tech,2010,2159,11,4.1,40.9
+XenonHub,Agriculture,2010,1244,24,6.8,48.7
+ForgeSoftware,Healthcare,2014,1212,8,10.7,34.8
+NeonHub,Telecom,2021,685,18,4.8,73.6
+MetaIO,Retail,2022,954,21,4.4,133.4
+IonData,Real Estate,2023,825,21,6.5,23.1
+NexusApp,Insurance,2014,1725,12,10.8,69.1
+CoreLogic,Supply Chain,2019,600,5,11.5,60.8
+QuestFlow,HR Tech,2016,1437,19,2.0,74.8
+BoltHub,E-commerce,2020,946,5,8.6,106.7
+AltoApp,Legal Tech,2018,1188,9,10.8,73.2
+RapidSync,Legal Tech,2016,1041,12,12.2,52.5
+AltoWorks,Media,2017,1700,30,14.5,61.5
+UnitySystems,Legal Tech,2018,1379,21,5.1,31.7
+QuantumLabs,EdTech,2017,1322,20,9.5,60.3
+CipherStack,Logistics,2013,796,5,4.3,144.5
+LumenWorks,Healthcare,2018,1161,16,10.7,79.2
+QuestIO,Media,2019,1878,17,7.8,21.1
+IonWorks,Marketing Tech,2022,1019,5,6.6,15.4
+SyncData,Marketing Tech,2015,2125,18,7.0,20.7
+OmniSystems,Retail,2016,2338,13,12.8,37.3
+BloomSync,Fintech,2023,1174,28,8.1,62.7
+EchoBase,Agriculture,2022,1125,13,9.3,37.2
+UnityApp,Supply Chain,2023,949,13,11.2,106.2
+VertexHub,Cybersecurity,2023,479,5,6.3,62.5
+ArcApp,Marketing Tech,2022,640,17,10.0,150.0
+BeamData,E-commerce,2022,544,5,13.9,100.8
+PulseSoftware,Travel,2020,1251,7,12.0,21.7
+QuestTech,Supply Chain,2014,2259,19,10.8,77.1
+DashCloud,E-commerce,2019,1129,5,13.1,52.0
+CoreSync,Healthcare,2015,2241,35,6.4,69.5
+JadeTech,Retail,2015,2151,29,8.8,55.5
+RapidBase,Travel,2017,1497,24,14.2,29.5
+GridData,Media,2019,1538,35,6.2,44.1
+BeamLogic,Insurance,2014,2194,47,4.5,26.9
+EchoStack,Agriculture,2022,1138,5,4.2,25.5
+WaveData,Legal Tech,2020,1501,11,7.5,62.2
+BaseHQ,Media,2014,1646,13,6.1,62.0
+ArcAnalytics,Real Estate,2013,2737,30,8.8,29.8
+PrimeCloud,Legal Tech,2013,1633,26,3.6,13.2
+DataBase,Legal Tech,2021,869,12,6.2,82.2
+BaseAnalytics,Healthcare,2014,1179,5,9.5,58.1
+FluxSoftware,Construction,2014,1407,12,9.9,65.4
+PeakFlow,Logistics,2017,1673,23,2.8,77.2
+SignalCloud,Marketing Tech,2020,736,5,4.0,73.1
+WaveMind,Travel,2014,1510,21,13.2,15.0
+PeakLogic,Construction,2020,1008,16,3.9,28.6
+FluxSystems,Healthcare,2012,2987,26,11.0,59.0
+ShiftFlow,Agriculture,2017,824,17,6.2,52.5
+VectorSync,Construction,2010,2751,46,4.3,46.3
+GridLogic,Supply Chain,2019,1366,13,6.3,56.9
+HyperIO,Retail,2021,1155,13,3.0,16.2
+ScaleIO,HR Tech,2022,750,11,9.0,27.0
+LumenHQ,Telecom,2022,796,14,4.7,57.4
+WaveStack,HR Tech,2010,2149,8,9.2,16.5
+CoreWorks,HR Tech,2020,1261,6,7.4,43.8
+HarborBase,Cybersecurity,2016,1856,8,12.0,69.8
+BaseFlow,Marketing Tech,2023,550,11,16.5,83.7
+FluxWorks,Agriculture,2017,1821,12,7.9,32.5
+NexusData,Construction,2016,1558,18,11.2,66.8
+CipherSoftware,Travel,2010,3073,33,13.0,17.0
+HarborAI,Cybersecurity,2016,1212,6,6.4,58.5
+BaseBase,Logistics,2015,2614,23,5.1,57.9
+ZenSystems,Retail,2011,1893,17,13.7,13.2
+DataOps,Manufacturing,2015,1340,17,10.9,22.6
+MetaSystems,Telecom,2023,926,5,6.5,102.9
+HarborLogic,Fintech,2024,920,13,16.3,148.4
+TitanHub,Marketing Tech,2017,1347,5,5.1,50.0
+OrbitOps,Legal Tech,2010,2883,52,10.9,62.1
+DataMind,Travel,2023,722,5,11.6,108.1
+YieldSoftware,HR Tech,2024,697,5,11.5,115.2
+VertexOps,Insurance,2021,793,15,13.9,67.6
+KiteLogic,Supply Chain,2014,1967,15,14.5,19.9
+PeakApp,Agriculture,2015,1570,7,7.9,57.1
+VectorLogic,Construction,2016,1741,15,2.3,71.9
+NeonIO,Telecom,2013,1598,7,10.4,18.2
+CloudLabs,Legal Tech,2017,891,5,7.1,68.2
+EchoSync,Cybersecurity,2024,788,25,16.4,24.3
+BoltCloud,Media,2017,1357,7,9.1,78.4
+BeamLabs,Logistics,2014,1453,11,10.3,51.8
+BaseData,Cybersecurity,2022,665,10,5.7,48.1
+PeakIO,Cybersecurity,2022,738,5,15.8,90.2
+MetaTech,Fintech,2012,2083,5,4.3,13.7
+ZenHub,Energy,2011,1792,14,8.7,17.6
+KiteData,Telecom,2010,3425,45,2.4,79.9
+DashHub,HR Tech,2017,1743,9,9.9,14.6
+ShiftMind,Construction,2018,1685,14,5.8,45.4
+ForgeTech,HR Tech,2023,937,25,6.5,64.1
+HarborApp,Retail,2021,1005,6,7.4,20.7
+IonSystems,E-commerce,2023,631,19,8.3,36.9
+DataSync,Agriculture,2018,1155,20,14.2,39.6
+YieldLabs,Legal Tech,2019,1105,5,4.0,43.8
+PrimeHQ,Agriculture,2015,1855,20,13.0,78.2
+RapidMind,Agriculture,2010,2110,32,11.9,74.5
+BeamAI,Supply Chain,2023,871,22,11.7,24.0
+ZenFlow,Real Estate,2016,2057,19,11.4,64.4
+OrbitMind,E-commerce,2024,276,5,12.8,55.4
+UnityHub,Travel,2019,1441,19,3.5,40.1
+SyncSync,Travel,2018,1283,21,2.7,24.3
+OmniSoftware,Marketing Tech,2014,1054,10,4.3,36.6
+XenonData,Energy,2018,1395,23,2.5,11.3
+ApexIO,Construction,2016,2097,20,2.3,32.7
+RapidWorks,Manufacturing,2011,1550,13,8.8,37.7
+TitanIO,EdTech,2015,1406,5,8.9,23.6
+BloomHQ,Manufacturing,2021,919,7,5.1,98.3
+ArcSystems,Supply Chain,2022,1324,21,10.5,57.7
+AltoIO,Cybersecurity,2017,1846,26,5.6,13.9
+KiteSystems,Legal Tech,2017,761,5,3.0,132.4
+VertexMind,Telecom,2018,1966,28,11.6,12.9
+OrbitCloud,Insurance,2019,1465,11,3.3,72.9
+BaseSystems,Energy,2020,641,7,8.8,99.3
+BoltHQ,Legal Tech,2016,1486,18,6.4,33.1
+NeonApp,Legal Tech,2014,1679,29,3.8,34.5
+TerraApp,Cybersecurity,2019,1105,17,12.3,66.9
+UnityFlow,E-commerce,2020,1653,14,6.0,76.6
+BaseStack,Real Estate,2013,1217,25,3.3,64.0
+BloomMind,Cybersecurity,2019,892,20,12.0,125.2
+HyperWorks,Healthcare,2016,1630,24,11.7,41.4
+MatrixData,Legal Tech,2022,913,13,15.8,80.0
+SyncApp,Energy,2018,1055,5,13.3,13.7
+IonHQ,Agriculture,2024,361,17,6.1,78.4
+KiteSoftware,Retail,2011,2780,17,2.7,45.1
+PulseApp,E-commerce,2015,1010,21,11.3,33.5
+CloudOps,Travel,2021,1210,25,3.5,27.9
+FluxBase,Telecom,2018,1057,5,2.6,39.4
+ApexTech,Travel,2019,1125,19,3.9,40.0
+RapidHQ,EdTech,2019,882,7,2.9,88.4
+KiteFlow,Agriculture,2010,2793,18,5.3,11.1
+ApexHQ,EdTech,2021,1235,7,4.2,34.7
+BloomWorks,Travel,2020,577,23,7.9,58.1
+CloudCloud,Healthcare,2015,2375,18,8.2,12.6
+TerraCloud,Legal Tech,2015,1358,27,6.8,72.3
+ZenWorks,Logistics,2015,2374,34,8.8,66.1
+YieldHub,E-commerce,2016,1730,8,3.0,56.3
+TitanWorks,Telecom,2021,1040,5,11.9,73.8
+RapidHub,Marketing Tech,2020,789,21,11.7,40.8
+QuantumSoftware,Telecom,2020,1245,10,12.1,35.6
+CipherSync,Healthcare,2019,1447,25,3.0,19.6
+BoltApp,Insurance,2020,823,5,8.5,70.3
+NeonTech,Marketing Tech,2022,844,5,12.0,149.8
+NexusTech,Cybersecurity,2023,543,6,16.5,125.4
+AltoHQ,E-commerce,2018,1452,19,11.2,59.0
+MetaHQ,Energy,2013,1416,18,2.3,48.8
+BoltWorks,Agriculture,2012,1316,23,11.3,46.8
+BloomHub,Construction,2011,1973,25,8.7,19.0
+BloomBase,Construction,2012,1915,30,2.7,18.7
+FluxOps,Supply Chain,2012,1910,15,13.6,69.2
+ScaleCloud,Agriculture,2014,2007,32,4.2,75.9
+FluxAnalytics,Telecom,2021,1430,33,2.9,13.2
+TerraSync,Marketing Tech,2020,1513,5,8.5,53.9
+SyncOps,Travel,2013,2490,30,2.8,40.8
+QuestSoftware,Insurance,2023,982,5,13.4,86.9
+PrimeIO,EdTech,2017,1466,6,2.7,76.2
+PulseAnalytics,Insurance,2024,619,8,16.9,80.7
+TitanStack,Fintech,2011,3175,12,9.6,13.4
+SyncStack,Telecom,2024,796,22,5.4,37.4
+ScaleHQ,Logistics,2015,1595,6,6.7,30.2
+CipherFlow,Media,2022,765,5,8.1,123.3
+BoltSoftware,Real Estate,2019,1684,10,3.8,33.3
+IonFlow,Media,2012,2806,32,6.1,37.5
+RapidOps,Construction,2015,2604,26,5.9,67.1
+BoltIO,HR Tech,2016,1477,7,14.6,64.8
+PrismStack,Supply Chain,2018,1502,5,2.4,76.4
+CoreCloud,Fintech,2017,1571,8,7.3,64.2
+IonLabs,Cybersecurity,2018,1789,13,8.8,32.0
+MetaWorks,Agriculture,2015,1949,8,14.4,29.5
+TitanData,Legal Tech,2022,956,9,10.3,141.5
+SyncTech,Construction,2020,1417,27,12.0,20.3
+XenonSystems,Manufacturing,2024,831,23,11.0,141.3
+WaveLogic,Cybersecurity,2011,3360,41,13.8,25.8
+PeakLabs,HR Tech,2016,1801,5,2.1,48.5
+HyperHub,Travel,2017,1435,22,2.8,63.8
+PeakBase,Healthcare,2024,425,5,17.0,71.6
+JadeAnalytics,Legal Tech,2024,376,5,16.1,63.6
+LumenStack,Cybersecurity,2023,875,5,7.8,115.0
+TerraLogic,Supply Chain,2010,2719,32,4.5,52.8
+SignalApp,Retail,2018,1081,5,14.8,43.4
+PulseAI,Marketing Tech,2016,1869,8,9.6,50.1
+DataTech,Media,2014,2278,29,11.1,31.8
+CoreOps,Manufacturing,2019,885,10,11.7,98.7
+IonBase,Real Estate,2022,874,18,7.7,139.2
+CoreLabs,Agriculture,2024,945,5,8.3,87.6
+XenonSync,Travel,2011,2613,25,7.4,49.5
+NeonWorks,Legal Tech,2021,875,17,5.3,29.5
+ForgeHQ,E-commerce,2018,982,14,4.3,37.6
+TerraHub,Manufacturing,2024,745,16,16.5,133.7
+EdgeHQ,HR Tech,2012,2766,26,12.9,62.9
+VectorBase,Retail,2018,1203,5,5.6,75.6
+YieldTech,Healthcare,2022,825,5,4.3,24.4
+QuestLabs,EdTech,2021,1079,5,12.3,64.3
+YieldSync,Insurance,2019,1340,5,14.8,46.5
+EchoOps,Marketing Tech,2010,2132,5,14.6,75.9
+LumenIO,Retail,2016,1595,22,8.2,69.5
+TitanSoftware,Media,2024,644,10,10.9,70.5
+GridHQ,E-commerce,2018,1108,20,9.9,12.8
+ApexCloud,Construction,2021,1337,26,14.3,31.2
+NovaCloud,Real Estate,2021,996,18,5.2,139.0
+BloomOps,Logistics,2017,1716,21,13.5,42.6
+YieldStack,Insurance,2024,568,12,15.2,116.4
+QuantumLogic,Agriculture,2024,924,5,8.3,69.4
+PulseStack,Agriculture,2020,1293,12,14.6,54.9
+JadeWorks,Supply Chain,2021,695,9,4.9,135.6
+TerraLabs,Energy,2010,974,23,10.2,28.8
+FluxAI,Real Estate,2018,1309,19,14.1,73.9
+UnityStack,Fintech,2010,3558,49,11.4,47.5
+SyncAI,Energy,2023,860,5,10.3,51.3
+RapidFlow,Marketing Tech,2023,823,29,8.8,93.5
+TitanSystems,Healthcare,2011,2651,9,10.3,59.2
+VertexStack,Retail,2020,1236,25,2.6,24.8
+WaveSync,Travel,2014,1069,13,10.6,22.6
+AltoAI,Real Estate,2019,1057,17,5.1,68.4
+CipherBase,Insurance,2016,1231,9,2.7,40.6
+QuestMind,Telecom,2016,1623,25,14.9,44.3
+BeamBase,Logistics,2016,2275,34,5.8,27.3
+ApexSystems,Marketing Tech,2012,1749,7,3.2,76.0
+ArcLogic,HR Tech,2012,1746,20,8.7,17.2
+VertexHQ,Agriculture,2011,2561,34,7.0,15.9
+NeonData,Construction,2018,1288,12,5.5,20.2
+ShiftHub,Legal Tech,2017,1321,8,11.4,44.7
+RapidCloud,Media,2011,1853,9,12.9,36.6
+BaseWorks,Insurance,2016,1396,31,11.0,43.5
+MetaApp,Insurance,2014,2890,16,6.9,67.2
+DashHQ,HR Tech,2024,947,23,11.2,143.9
+HarborCloud,Media,2022,768,5,11.2,51.5
+UnitySoftware,Retail,2022,856,9,10.6,89.5
+WaveHub,Agriculture,2010,3076,30,10.5,34.9
+TerraMind,Healthcare,2019,1581,11,3.4,16.9
+NeonSync,Construction,2013,2368,28,9.7,45.0
+IonTech,Legal Tech,2016,899,7,7.9,46.9
+GridWorks,Insurance,2011,1124,13,10.4,57.4
+HyperData,Energy,2012,1790,32,8.0,65.8
+SignalAnalytics,Supply Chain,2020,1541,27,13.5,41.5
+ForgeApp,Fintech,2021,802,19,12.8,95.1
+MatrixAnalytics,Manufacturing,2015,1886,33,8.4,77.6
+AltoMind,Logistics,2019,1516,29,8.0,22.1
+VectorOps,Telecom,2019,867,8,3.5,68.5
+FluxFlow,Logistics,2016,1658,8,8.3,47.6
+TerraAnalytics,Agriculture,2012,1992,35,7.9,13.8
+JadeSoftware,Real Estate,2023,1099,9,12.4,39.1
+GridStack,Supply Chain,2011,1312,9,4.9,30.2
+NeonFlow,HR Tech,2019,1322,8,9.0,63.0
+ArcWorks,Agriculture,2013,1382,5,7.8,34.4
+VertexWorks,HR Tech,2022,789,13,11.2,41.6
+EdgeCloud,Real Estate,2022,974,15,10.0,62.1
+XenonOps,Legal Tech,2019,1319,27,12.2,74.3
+ShiftSoftware,Cybersecurity,2013,1911,22,7.1,20.0
+SignalLogic,Retail,2016,947,20,5.6,141.7
+JadeIO,Construction,2010,1960,24,6.7,14.4
+MatrixApp,Real Estate,2016,1966,15,6.4,50.5
+BaseLabs,Healthcare,2011,2674,45,4.1,42.0
+ForgeCloud,Cybersecurity,2024,621,21,7.6,105.1
+ScaleSystems,Manufacturing,2020,845,5,11.4,118.2
+ForgeSystems,HR Tech,2010,2768,25,8.8,41.2
+NovaIO,HR Tech,2023,871,11,4.7,124.8
+EdgeApp,Cybersecurity,2020,846,5,9.9,41.3
+BeamCloud,Cybersecurity,2024,595,5,5.8,36.0
+YieldApp,Manufacturing,2016,1179,5,5.2,52.1
+YieldMind,Legal Tech,2022,829,16,9.6,117.2
+SyncLabs,EdTech,2017,1067,16,2.9,72.2
+NovaHQ,Insurance,2012,3163,36,4.2,43.0
+BloomSystems,Fintech,2019,620,24,2.8,122.6
+KiteOps,Energy,2022,1097,19,10.0,20.7
+VertexFlow,Real Estate,2022,974,17,12.9,104.5
+YieldData,Healthcare,2013,2094,24,2.7,56.6
+UnityAnalytics,HR Tech,2010,1648,36,6.5,46.2
+HyperHQ,Cybersecurity,2021,991,5,6.9,75.8
+LumenSystems,Marketing Tech,2021,1079,9,3.2,70.2
+HyperLogic,HR Tech,2024,605,5,4.6,132.2
+PulseLabs,Travel,2015,1259,23,2.5,66.2
+PulseHub,Insurance,2014,2576,38,13.7,22.6
+LumenLabs,Logistics,2011,2264,25,7.9,35.8
+TitanMind,EdTech,2017,1796,17,11.9,27.2
+NovaHub,Fintech,2013,1942,5,11.9,36.3
+ZenOps,HR Tech,2013,2020,5,14.6,20.0
+ShiftSystems,Healthcare,2024,723,5,10.0,117.2
+PrismTech,Energy,2012,2352,6,7.7,77.5
+PulseOps,Marketing Tech,2023,795,5,6.5,142.7
+EdgeSync,HR Tech,2012,1710,15,3.6,35.1
+BloomCloud,Media,2014,1646,33,10.9,67.8
+AltoSoftware,E-commerce,2021,1096,18,6.4,67.4
+MetaAI,Logistics,2023,1178,14,4.8,65.6
+CoreAI,Healthcare,2023,744,9,8.3,101.9
+PrismSync,Marketing Tech,2024,159,11,9.8,36.7
+BaseTech,Healthcare,2017,1356,23,7.1,12.1
+VectorHub,Supply Chain,2015,1360,29,3.9,53.0
+RapidData,Legal Tech,2017,2220,23,7.0,39.3
+TerraFlow,EdTech,2020,939,6,8.2,121.6
+BeamSync,Energy,2015,1572,27,4.8,72.7
+BloomLogic,Healthcare,2022,1162,5,15.7,17.0
+UnityData,Marketing Tech,2018,1049,22,7.0,75.5
+MetaAnalytics,EdTech,2019,1036,7,14.3,49.5
+JadeBase,Legal Tech,2012,1110,21,4.8,46.9
+EdgeIO,Supply Chain,2024,252,14,15.9,120.7
+XenonApp,Construction,2011,2280,18,11.5,40.6
+SignalStack,Insurance,2012,3236,38,12.6,36.5
+YieldOps,Cybersecurity,2012,1609,26,14.5,12.3
+SignalSync,HR Tech,2024,679,5,8.5,61.5
+SignalSystems,Insurance,2017,1155,5,6.6,65.1
+YieldAI,Healthcare,2016,1807,14,13.5,34.6
+CipherTech,Travel,2022,782,20,14.0,58.3
+AltoLogic,HR Tech,2011,1861,10,9.1,72.9
+VertexIO,Telecom,2019,1030,5,9.9,40.4
+BaseCloud,Real Estate,2016,2628,22,5.9,16.7
+DashSync,Agriculture,2023,484,6,4.6,127.1
+SignalMind,Travel,2013,932,8,14.7,81.6
+DashStack,Travel,2024,548,5,6.4,135.1
+BoltAnalytics,Media,2010,3040,43,5.5,14.3
+ArcTech,E-commerce,2020,1539,15,5.0,14.3
+VectorStack,Construction,2024,597,24,15.1,24.5
+OrbitFlow,Construction,2020,875,8,4.2,148.0
+OmniCloud,Cybersecurity,2010,1711,32,10.2,68.4
+YieldSystems,E-commerce,2016,2208,16,8.8,74.2
+NovaMind,Construction,2018,1614,6,9.4,50.8
+PrimeTech,Construction,2022,968,23,8.3,69.8
+JadeSync,Telecom,2017,1053,17,9.9,58.6
+CloudApp,Insurance,2021,855,22,7.3,63.9
+TitanOps,Marketing Tech,2023,634,19,9.3,127.4
+QuestSystems,Real Estate,2017,1836,27,6.9,13.9
+HyperSystems,Legal Tech,2021,1009,11,13.9,12.0
+NexusCloud,Healthcare,2013,2059,22,4.6,35.8
+HarborFlow,Logistics,2020,595,13,7.8,144.9
+IonSync,Agriculture,2015,1350,19,3.2,11.9
+DataAnalytics,Construction,2022,657,5,11.5,86.7
+BloomAI,Travel,2024,169,10,14.5,59.7
+XenonLogic,Retail,2024,801,11,7.9,87.7
+RapidApp,Construction,2011,2906,28,9.9,30.9
+PrimeStack,E-commerce,2015,1754,27,14.4,55.6
+LumenData,Healthcare,2022,1093,19,3.3,44.8
+SyncLogic,Retail,2016,1326,16,12.6,34.0
+UnityHQ,Energy,2014,2384,25,3.7,28.1
+NeonAnalytics,Insurance,2020,938,25,6.0,122.5
+ScaleSync,Legal Tech,2017,1474,16,9.5,53.4
+IonCloud,Energy,2011,2948,16,13.3,20.6
+NexusIO,Retail,2019,1073,5,12.1,44.1
+AltoLabs,Fintech,2017,1136,5,8.4,63.4
+VertexSoftware,Telecom,2016,2168,21,7.0,12.6
+NexusHQ,Fintech,2024,544,5,12.1,52.3
+WaveHQ,Legal Tech,2012,2491,11,2.8,13.2
+SyncWorks,Energy,2019,1528,5,6.5,73.1
+HyperApp,Fintech,2013,1326,15,8.6,18.6
+XenonLabs,Logistics,2024,989,15,16.9,106.1
+TerraAI,Healthcare,2021,1137,16,5.8,59.1
+OmniAI,Legal Tech,2016,1545,22,11.1,39.3
+PrimeFlow,Telecom,2011,1358,18,4.6,28.4
+LumenCloud,Manufacturing,2021,873,15,14.3,109.5
+IonIO,EdTech,2010,1199,17,8.4,76.5
+BloomFlow,E-commerce,2021,932,9,15.4,58.5
+PrimeAnalytics,Healthcare,2023,752,5,4.7,118.6
+CloudAI,Cybersecurity,2020,1132,13,14.4,28.8
+DashApp,Media,2014,2520,30,4.2,19.3
+HyperTech,Retail,2024,1057,5,11.9,64.5
+RapidAI,Cybersecurity,2017,1294,5,5.4,32.0
+XenonFlow,Construction,2021,1063,19,11.6,16.7
+RapidLabs,Fintech,2020,1455,24,4.2,62.6
+AltoData,Insurance,2014,2222,17,7.2,26.4
+HarborWorks,Construction,2017,1918,21,11.7,11.2
+CloudBase,Agriculture,2010,2471,26,10.7,76.5
+BoltLabs,EdTech,2023,1073,15,9.7,56.0
+XenonWorks,HR Tech,2011,1874,31,10.2,66.0
+BoltTech,Healthcare,2024,403,15,13.4,33.9
+XenonIO,HR Tech,2022,521,7,8.9,96.6
+JadeAI,Energy,2021,1231,11,14.5,64.7
+MetaSync,Supply Chain,2021,765,13,14.0,85.5
+CipherHub,Telecom,2024,747,5,16.6,78.9
+EdgeSoftware,Retail,2019,1750,16,13.2,59.8
+NeonCloud,Real Estate,2013,2160,5,14.8,55.5
+MetaFlow,Agriculture,2021,972,12,8.7,94.2
+SyncHub,Fintech,2018,836,19,2.7,54.7
+HyperOps,Marketing Tech,2012,1864,5,6.7,41.7
+CipherData,Energy,2022,773,6,8.4,122.5
+VectorIO,Agriculture,2010,1923,26,13.2,41.0
+PeakHQ,Construction,2018,1276,6,14.8,15.2
+CoreApp,Healthcare,2016,2140,30,13.0,10.4
+HarborSoftware,Healthcare,2012,1292,17,9.2,15.1
+ApexFlow,Supply Chain,2016,2374,23,13.5,56.4
+SyncCloud,Telecom,2018,1603,18,7.8,73.3
+MatrixOps,Fintech,2024,935,9,10.3,58.5
+AltoFlow,E-commerce,2011,3249,32,4.7,54.1
+OmniHub,HR Tech,2013,2280,7,2.3,60.2
+CloudSystems,E-commerce,2010,2372,42,5.0,28.1
+CipherWorks,Logistics,2016,1045,13,2.1,60.4
+ApexSync,Healthcare,2021,1115,27,11.4,52.5
+CipherApp,Fintech,2017,1793,20,12.4,69.5
+SyncSoftware,Legal Tech,2020,1109,14,3.8,12.9
+DashBase,Agriculture,2011,1950,36,10.4,45.9
+HyperAnalytics,EdTech,2019,840,23,9.4,27.1
+ArcBase,Media,2020,918,5,3.3,114.3
+BeamSoftware,EdTech,2011,1281,14,6.3,56.2
+FluxSync,Construction,2015,1923,20,12.2,59.9
+ShiftHQ,Cybersecurity,2020,1536,12,12.1,44.1
+VertexLogic,Cybersecurity,2024,644,13,5.0,29.8
+QuantumFlow,Fintech,2023,1107,5,15.3,48.6
+MatrixBase,Travel,2020,1210,27,12.0,61.3
+KiteAI,EdTech,2023,1024,5,5.8,76.4
+ZenStack,Manufacturing,2010,2959,34,5.0,56.8
+ZenLogic,Construction,2018,1334,9,9.6,72.9
+ScaleApp,EdTech,2018,1540,16,13.5,10.5
+EdgeWorks,Supply Chain,2013,2498,18,4.0,52.1
+CoreData,Retail,2022,899,10,5.7,41.0
+EchoAI,EdTech,2010,3169,38,2.5,50.1
+ScaleAnalytics,Energy,2016,2071,24,10.6,29.8
+VertexCloud,Media,2019,1453,16,9.8,65.6
+BloomAnalytics,Telecom,2020,1017,6,14.0,51.8
+ApexData,Logistics,2016,776,24,13.8,109.0
+FluxMind,HR Tech,2012,1554,5,3.2,56.2
+QuestBase,Fintech,2024,1090,25,4.6,47.1
+PeakStack,Logistics,2015,2371,16,8.2,26.3
+EchoLogic,Real Estate,2010,1719,18,2.1,55.8
+WaveIO,Retail,2015,1380,6,5.4,47.5
+OrbitHQ,Telecom,2014,2217,32,9.2,22.5
+NeonBase,Travel,2014,2676,17,11.6,69.8
+UnityTech,EdTech,2017,1230,13,12.2,66.1
+SignalAI,E-commerce,2023,859,7,6.4,30.4
+DashMind,Energy,2014,1247,11,2.1,69.5
+LumenOps,Real Estate,2010,3534,30,4.2,12.5
+ShiftApp,Manufacturing,2020,1567,5,11.6,14.8
+VertexBase,Legal Tech,2021,1438,27,6.1,52.4
+NexusWorks,Logistics,2019,877,5,9.3,85.4
+MatrixSync,Marketing Tech,2021,1386,7,12.3,77.3
+PrismAI,Travel,2011,1461,6,10.8,26.1
+AltoHub,Manufacturing,2018,907,5,7.2,117.3
+OrbitLogic,Supply Chain,2021,1251,5,12.1,71.1
+OmniData,Real Estate,2023,568,5,15.5,107.9
+CloudStack,Manufacturing,2019,1805,14,4.4,63.5
+DashData,Construction,2012,2852,27,2.4,34.3
+VectorAnalytics,Media,2011,3376,18,2.2,24.8
+RapidLogic,Supply Chain,2018,1179,17,6.5,22.9
+EchoHQ,Manufacturing,2023,908,5,16.2,109.2
+PrimeLogic,EdTech,2018,1450,34,11.6,43.1
+NovaAnalytics,Retail,2017,2070,27,8.3,27.6
+OrbitLabs,Logistics,2011,1688,13,8.2,54.1
+GridIO,Marketing Tech,2015,2684,11,6.5,38.8
+BeamMind,Real Estate,2019,1594,7,6.6,57.1
+VertexApp,Telecom,2014,1365,27,6.4,54.2
+OrbitApp,E-commerce,2011,2233,28,5.8,28.7
+ShiftWorks,Manufacturing,2021,1493,6,13.6,18.8
+PulseLogic,E-commerce,2013,2002,40,13.4,48.4
+QuantumApp,Energy,2022,538,5,11.5,135.1
+GridSoftware,Cybersecurity,2018,521,20,13.9,132.4
+ShiftBase,Media,2012,2982,23,10.2,54.5
+OrbitHub,Energy,2020,1574,13,9.0,66.3
+GridOps,Manufacturing,2016,1244,21,12.6,69.4
+BeamOps,Travel,2018,1717,28,7.6,30.5
+PeakAI,Agriculture,2015,2220,13,4.1,61.6
+SignalData,Energy,2022,961,13,13.5,73.7
+ApexAnalytics,Cybersecurity,2014,2345,29,8.4,32.4
+FluxLabs,Agriculture,2010,1523,25,7.7,10.6
+NovaStack,Real Estate,2015,2015,14,11.1,12.2
+DataLogic,Logistics,2011,2843,43,5.3,36.7
+NovaTech,EdTech,2016,2114,5,4.6,61.5
+UnityCloud,Travel,2016,1839,31,2.5,75.6
+LumenTech,Marketing Tech,2017,1537,5,13.2,25.2
+NovaLabs,Construction,2022,1024,5,6.2,45.0
+VectorMind,Insurance,2024,514,5,13.1,122.9
+EdgeStack,EdTech,2015,2114,5,11.0,35.1
+EdgeLogic,Healthcare,2017,2229,31,8.4,49.7
+MatrixHQ,Insurance,2021,1286,18,4.5,30.7
+ScaleBase,Manufacturing,2017,1820,28,2.2,70.0
+PulseIO,E-commerce,2020,1214,13,12.0,20.8
+SyncIO,Retail,2020,652,5,2.6,141.9
+MetaLabs,Real Estate,2011,1735,30,12.9,56.1
+LumenMind,Construction,2014,1824,5,2.2,74.5
+TerraStack,E-commerce,2017,1216,28,13.6,67.5
+OmniFlow,HR Tech,2011,2441,15,8.8,27.4
+EchoTech,Construction,2015,2452,8,12.3,48.5
+KiteIO,Supply Chain,2018,1808,16,14.9,32.7
