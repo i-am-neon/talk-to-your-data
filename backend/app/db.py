@@ -138,6 +138,35 @@ async def get_message_history(conversation_id: uuid.UUID) -> list[dict]:
         return [dict(r) for r in rows]
 
 
+async def get_pydantic_messages(conversation_id: uuid.UUID) -> bytes | None:
+    """Load the full PydanticAI message history for a conversation."""
+    pool = _get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT pydantic_messages FROM conversations WHERE id = $1",
+            conversation_id,
+        )
+        if row and row["pydantic_messages"]:
+            value = row["pydantic_messages"]
+            # asyncpg returns JSONB as a JSON string; encode to bytes for Pydantic
+            if isinstance(value, str):
+                return value.encode()
+            if isinstance(value, bytes):
+                return value
+            return json.dumps(value).encode()
+        return None
+
+
+async def save_pydantic_messages(conversation_id: uuid.UUID, messages_json: bytes) -> None:
+    """Persist the full PydanticAI message history for a conversation."""
+    pool = _get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE conversations SET pydantic_messages = $1::jsonb WHERE id = $2",
+            messages_json.decode(), conversation_id,
+        )
+
+
 async def save_artifact(
     conversation_id: uuid.UUID, artifact_id: str, title: str, type: str, version: int,
     code: str | None = None, images: list[str] | None = None,

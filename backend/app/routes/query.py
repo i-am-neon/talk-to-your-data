@@ -10,7 +10,7 @@ from fastapi import APIRouter, Header
 from fastapi.responses import StreamingResponse
 from pydantic_ai import AgentRunResultEvent
 from pydantic_ai.messages import (
-    ModelMessage, ModelRequest, ModelResponse, UserPromptPart, TextPart,
+    ModelMessagesTypeAdapter, TextPart,
     PartStartEvent, PartDeltaEvent, FunctionToolCallEvent, FunctionToolResultEvent,
     ThinkingPart, ThinkingPartDelta, TextPartDelta, RetryPromptPart,
 )
@@ -99,17 +99,12 @@ def _parse_artifact(text: str, existing_ids: set[str]) -> tuple[str, ArtifactMet
     return clean_text, ArtifactMeta(id=artifact_id, title=title, type=art_type, action=action)
 
 
-def _build_message_history(messages: list[dict]) -> list[ModelMessage] | None:
-    """Convert stored messages to PydanticAI message format."""
-    if not messages:
+async def _load_message_history(conv_id: uuid.UUID):
+    """Load the full PydanticAI message history from the database."""
+    raw = await db.get_pydantic_messages(conv_id)
+    if raw is None:
         return None
-    result: list[ModelMessage] = []
-    for msg in messages:
-        if msg["role"] == "user":
-            result.append(ModelRequest(parts=[UserPromptPart(content=msg["content"])]))
-        else:
-            result.append(ModelResponse(parts=[TextPart(content=msg["content"])]))
-    return result
+    return ModelMessagesTypeAdapter.validate_json(raw)
 
 
 def _sse_event(data: dict) -> str:
@@ -132,22 +127,24 @@ def _extract_tool_code(args: str | dict | None) -> str:
 async def _persist_response(
     conv_id: uuid.UUID, question: str, answer_text: str,
     code: str, images: list[str], chart: dict | None, table: dict | None,
-    artifact: ArtifactMeta | None, history: list[dict],
+    artifact: ArtifactMeta | None, is_first_message: bool,
+    pydantic_messages_json: bytes,
 ) -> None:
-    """Persist user msg, assistant msg, artifact version, and update title."""
+    """Persist user msg, assistant msg, artifact version, pydantic history, and update title."""
     await db.save_message(conv_id, "user", question)
     await db.save_message(
         conv_id, "assistant", answer_text,
         code=code or None, images=images or None,
         chart=chart, table=table, artifact=artifact.model_dump() if artifact else None,
     )
+    await db.save_pydantic_messages(conv_id, pydantic_messages_json)
     if artifact:
         version = await db.next_artifact_version(conv_id, artifact.id)
         await db.save_artifact(
             conv_id, artifact.id, artifact.title, artifact.type, version,
             code=code or None, images=images or None, chart=chart, table=table,
         )
-    if not history:
+    if is_first_message:
         await db.update_conversation_title(conv_id, question[:50])
     else:
         await db.touch_conversation(conv_id)
@@ -160,7 +157,7 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
     if not req.question.strip():
         return QueryResponse(answer="", error="Please enter a question.", conversation_id=str(conv_id))
 
-    history = await db.get_message_history(conv_id)
+    message_history = await _load_message_history(conv_id)
     artifact_descriptors = await db.get_artifact_descriptors(conv_id)
 
     deps = AgentDeps(
@@ -169,7 +166,6 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
     )
 
     try:
-        message_history = _build_message_history(history)
         override_model = make_model(req.model) if req.model else None
         result = await agent.run(req.question, deps=deps, message_history=message_history, model=override_model)
 
@@ -204,7 +200,11 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
 
         chart_dict = chart.model_dump() if chart else None
         table_dict = table.model_dump() if table else None
-        await _persist_response(conv_id, req.question, answer_text, code, images, chart_dict, table_dict, artifact, history)
+        await _persist_response(
+            conv_id, req.question, answer_text, code, images, chart_dict, table_dict,
+            artifact, is_first_message=message_history is None,
+            pydantic_messages_json=result.all_messages_json(),
+        )
 
         return QueryResponse(
             answer=answer_text, code=code, chart=chart, table=table, images=images,
@@ -224,7 +224,7 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
             yield _sse_event({"type": "done", "answer": "", "code": "", "images": [], "artifact": None, "error": "Please enter a question.", "conversation_id": str(conv_id)})
             return
 
-        history = await db.get_message_history(conv_id)
+        message_history = await _load_message_history(conv_id)
         artifact_descriptors = await db.get_artifact_descriptors(conv_id)
 
         deps = AgentDeps(
@@ -233,7 +233,6 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
         )
 
         try:
-            message_history = _build_message_history(history)
             override_model = make_model(req.model) if req.model else None
 
             full_text = ""
@@ -315,7 +314,11 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
                         "error": None, "conversation_id": str(conv_id),
                     })
 
-                    await _persist_response(conv_id, req.question, answer_text, code, images, chart_dict, table_dict, artifact, history)
+                    await _persist_response(
+                        conv_id, req.question, answer_text, code, images, chart_dict, table_dict,
+                        artifact, is_first_message=message_history is None,
+                        pydantic_messages_json=event.result.all_messages_json(),
+                    )
 
         except Exception as e:
             yield _sse_event({

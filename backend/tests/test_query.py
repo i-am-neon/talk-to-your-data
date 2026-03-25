@@ -1,7 +1,7 @@
 import uuid
 import pytest
 from httpx import AsyncClient, ASGITransport
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, AsyncMock, MagicMock
 from app.main import app
 from app import db
 from app.routes.query import _parse_artifact
@@ -75,10 +75,11 @@ async def test_query_empty_question(client):
 async def test_query_saves_messages(client):
     conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
 
-    mock_result = AsyncMock()
+    mock_result = MagicMock()
     mock_result.output = "The revenue is $1M"
+    mock_result.all_messages_json.return_value = b"[]"
 
-    with patch("app.routes.query.agent.run", return_value=mock_result):
+    with patch("app.routes.query.agent.run", new_callable=AsyncMock, return_value=mock_result):
         resp = await client.post(
             "/api/query",
             json={"question": "What is revenue?", "conversation_id": conv_id},
@@ -99,10 +100,11 @@ async def test_query_saves_messages(client):
 async def test_query_auto_titles_conversation(client):
     conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
 
-    mock_result = AsyncMock()
+    mock_result = MagicMock()
     mock_result.output = "Answer"
+    mock_result.all_messages_json.return_value = b"[]"
 
-    with patch("app.routes.query.agent.run", return_value=mock_result):
+    with patch("app.routes.query.agent.run", new_callable=AsyncMock, return_value=mock_result):
         await client.post(
             "/api/query",
             json={"question": "What is the average ARR for fintech companies in Q4?", "conversation_id": conv_id},
