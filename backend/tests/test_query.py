@@ -1,3 +1,4 @@
+import json
 import uuid
 import pytest
 import httpx as _httpx
@@ -175,3 +176,111 @@ async def test_query_generic_error_returns_internal(client):
     data = resp.json()
     assert data["error_code"] == "internal_error"
     assert "something went wrong" in data["error"].lower()
+
+
+# ---------------------------------------------------------------------------
+# Streaming endpoint (SSE) tests
+# ---------------------------------------------------------------------------
+
+def _parse_sse_events(body: str) -> list[dict]:
+    """Parse SSE text into a list of event dicts."""
+    events = []
+    for line in body.splitlines():
+        line = line.strip()
+        if line.startswith("data: "):
+            events.append(json.loads(line[6:]))
+    return events
+
+
+async def test_stream_empty_question(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+    resp = await client.post(
+        "/api/query/stream",
+        json={"question": "", "conversation_id": conv_id},
+        headers=HEADERS,
+    )
+    assert resp.status_code == 200
+    events = _parse_sse_events(resp.text)
+    assert len(events) == 1
+    assert events[0]["type"] == "done"
+    assert events[0]["error_code"] == "empty_question"
+
+
+async def test_stream_question_too_long(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+    resp = await client.post(
+        "/api/query/stream",
+        json={"question": "x" * 2001, "conversation_id": conv_id},
+        headers=HEADERS,
+    )
+    assert resp.status_code == 200
+    events = _parse_sse_events(resp.text)
+    assert len(events) == 1
+    assert events[0]["type"] == "done"
+    assert events[0]["error_code"] == "question_too_long"
+
+
+async def test_stream_llm_timeout(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+
+    async def mock_raising_stream(*args, **kwargs):
+        raise _httpx.ReadTimeout("timed out")
+        yield  # pragma: no cover
+
+    with patch("app.routes.query.agent.run_stream_events", return_value=mock_raising_stream()):
+        resp = await client.post(
+            "/api/query/stream",
+            json={"question": "What is revenue?", "conversation_id": conv_id},
+            headers=HEADERS,
+        )
+
+    events = _parse_sse_events(resp.text)
+    done = [e for e in events if e["type"] == "done"]
+    assert len(done) == 1
+    assert done[0]["error_code"] == "llm_timeout"
+    assert "try again" in done[0]["error"].lower()
+
+
+async def test_stream_rate_limit(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+
+    response = _httpx.Response(429, request=_httpx.Request("POST", "http://test"))
+    exc = _httpx.HTTPStatusError("rate limited", request=response.request, response=response)
+
+    async def mock_raising_stream(*args, **kwargs):
+        raise exc
+        yield  # pragma: no cover
+
+    with patch("app.routes.query.agent.run_stream_events", return_value=mock_raising_stream()):
+        resp = await client.post(
+            "/api/query/stream",
+            json={"question": "What is revenue?", "conversation_id": conv_id},
+            headers=HEADERS,
+        )
+
+    events = _parse_sse_events(resp.text)
+    done = [e for e in events if e["type"] == "done"]
+    assert len(done) == 1
+    assert done[0]["error_code"] == "llm_rate_limited"
+    assert "busy" in done[0]["error"].lower()
+
+
+async def test_stream_generic_error(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+
+    async def mock_raising_stream(*args, **kwargs):
+        raise RuntimeError("unexpected")
+        yield  # pragma: no cover
+
+    with patch("app.routes.query.agent.run_stream_events", return_value=mock_raising_stream()):
+        resp = await client.post(
+            "/api/query/stream",
+            json={"question": "What is revenue?", "conversation_id": conv_id},
+            headers=HEADERS,
+        )
+
+    events = _parse_sse_events(resp.text)
+    done = [e for e in events if e["type"] == "done"]
+    assert len(done) == 1
+    assert done[0]["error_code"] == "internal_error"
+    assert "something went wrong" in done[0]["error"].lower()
