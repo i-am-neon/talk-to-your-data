@@ -1,0 +1,45 @@
+cases:
+  - name: row_count
+    inputs: "How many rows are in the dataset?"
+    expected_output: "500"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "500"
+
+  - name: average_arr
+    inputs: "What is the average ARR across all companies?"
+    expected_output: "1473"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "1473"
+
+  - name: filter_count
+    inputs: "How many companies are in Fintech?"
+    expected_output: "19"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "19"
+
+  - name: highest_churn
+    inputs: "Which company has the highest churn rate?"
+    expected_output: "PeakBase"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "PeakBase"
+
+  - name: multi_step
+    inputs: "What's the average employee count for companies founded after 2015?"
+    expected_output: "13.84"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "13.84"
+
+evaluators:
+  - name: MaxDuration
+    arguments:
+      seconds: 30
