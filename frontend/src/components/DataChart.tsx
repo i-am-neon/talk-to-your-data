@@ -26,6 +26,13 @@ import {
 } from "@/components/ui/chart";
 import type { ChartSpec } from "../types";
 
+/** Turn a data key like "company_name" into "Company Name" */
+function humanize(key: string): string {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function buildConfig(spec: ChartSpec): ChartConfig {
   const config: ChartConfig = {};
   if (spec.type === "pie") {
@@ -60,12 +67,26 @@ function CartesianChart({
   const ChartType =
     spec.type === "bar" ? BarChart : spec.type === "line" ? LineChart : AreaChart;
 
+  const xLabel = humanize(spec.x_key);
+  const yLabel = spec.series.length === 1 ? spec.series[0].label : undefined;
+
   return (
     <ChartContainer config={config} className="min-h-[300px] w-full">
-      <ChartType data={spec.data} accessibilityLayer>
+      <ChartType data={spec.data} accessibilityLayer margin={{ bottom: yLabel ? 20 : 16, left: yLabel ? 20 : 0 }}>
         <CartesianGrid vertical={false} />
-        <XAxis dataKey={spec.x_key} tickLine={false} axisLine={false} tickMargin={8} />
-        <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+        <XAxis
+          dataKey={spec.x_key}
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          label={{ value: xLabel, position: "insideBottom", offset: -12, className: "fill-muted-foreground text-[11px]" }}
+        />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          label={yLabel ? { value: yLabel, angle: -90, position: "insideLeft", offset: -12, className: "fill-muted-foreground text-[11px]" } : undefined}
+        />
         <ChartTooltip content={<ChartTooltipContent />} />
         {spec.series.length > 1 && (
           <ChartLegend content={<ChartLegendContent />} />

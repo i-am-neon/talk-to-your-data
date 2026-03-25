@@ -10,9 +10,9 @@ from app.routes.query import router as query_router
 from app.routes.conversations import router as conversations_router
 
 logfire.configure(
-    token=settings.logfire_token if settings.logfire_token else None,
-    send_to_logfire=bool(settings.logfire_token),
+    token=settings.logfire_token or None,
 )
+logfire.instrument_pydantic_ai()
 logfire.instrument_asyncpg()
 
 

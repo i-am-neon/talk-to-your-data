@@ -52,9 +52,22 @@ export default function App() {
 
   const hasArtifacts = artifactStore.artifacts.length > 0;
   const hasMessages = messages.length > 0;
+  const [workspaceCollapsed, setWorkspaceCollapsed] = useState(false);
+
+  // Auto-expand workspace when a new artifact arrives
+  const artifactCount = artifactStore.artifacts.length;
+  const prevArtifactCount = useRef(artifactCount);
+  useEffect(() => {
+    if (artifactCount > prevArtifactCount.current) {
+      setWorkspaceCollapsed(false);
+    }
+    prevArtifactCount.current = artifactCount;
+  }, [artifactCount]);
+
+  const workspaceOpen = hasArtifacts && !workspaceCollapsed;
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar
         conversations={conversations}
         activeId={activeId}
@@ -62,22 +75,20 @@ export default function App() {
         onSelect={select}
         onCreate={handleNewChat}
         onDelete={remove}
+        footer={<ThemeToggle theme={theme} onChange={setTheme} />}
       />
 
       {/* Chat panel */}
-      <div className={`flex flex-col min-h-0 transition-all duration-300 ${hasArtifacts ? "w-1/2" : "flex-1 max-w-2xl mx-auto"}`}>
-        <div className="flex items-center justify-end px-4 py-2">
-          <ThemeToggle theme={theme} onChange={setTheme} />
-        </div>
+      <div className={`flex flex-col min-h-0 overflow-hidden transition-all duration-300 ${workspaceOpen ? "w-1/2" : "flex-1 max-w-2xl mx-auto"}`}>
 
         {hasMessages ? (
-          <ScrollArea className="flex-1 px-4">
+          <ScrollArea className="flex-1 min-h-0 px-4">
             <div className="space-y-5 py-4 max-w-2xl mx-auto">
               {isLoadingHistory && (
                 <p className="text-muted-foreground text-center mt-8">Loading conversation...</p>
               )}
               {messages.map((msg, i) => (
-                <ChatMessage key={i} message={msg} isStreaming={isStreaming && i === messages.length - 1} onArtifactClick={artifactStore.setSelectedId} />
+                <ChatMessage key={i} message={msg} isStreaming={isStreaming && i === messages.length - 1} onArtifactClick={(id) => { artifactStore.setSelectedId(id); setWorkspaceCollapsed(false); }} />
               ))}
               <div ref={bottomRef} />
             </div>
@@ -93,14 +104,14 @@ export default function App() {
 
       {/* Workspace panel */}
       {hasArtifacts && (
-        <div className="w-1/2 border-l border-border animate-slide-in-right">
-          <WorkspacePanel
-            artifacts={artifactStore.artifacts}
-            selectedId={artifactStore.selectedId}
-            onSelect={artifactStore.setSelectedId}
-            onVersionChange={artifactStore.setVersion}
-          />
-        </div>
+        <WorkspacePanel
+          artifacts={artifactStore.artifacts}
+          selectedId={artifactStore.selectedId}
+          onSelect={artifactStore.setSelectedId}
+          onVersionChange={artifactStore.setVersion}
+          collapsed={workspaceCollapsed}
+          onToggleCollapse={() => setWorkspaceCollapsed(!workspaceCollapsed)}
+        />
       )}
     </div>
   );

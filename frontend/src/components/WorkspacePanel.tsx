@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { PanelRightClose, PanelRight } from "lucide-react";
 import { CodeBlock } from "./CodeBlock";
 import { ChartImage } from "./ChartImage";
 import { DataChart } from "./DataChart";
@@ -12,6 +13,8 @@ interface WorkspacePanelProps {
   selectedId: string | null;
   onSelect: (id: string) => void;
   onVersionChange: (artifactId: string, versionIndex: number) => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export function WorkspacePanel({
@@ -19,99 +22,127 @@ export function WorkspacePanel({
   selectedId,
   onSelect,
   onVersionChange,
+  collapsed,
+  onToggleCollapse,
 }: WorkspacePanelProps) {
   const selected = artifacts.find((a) => a.id === selectedId) ?? null;
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Artifact tabs at top */}
-      <div className="border-b border-border px-3 py-2 flex gap-1 overflow-x-auto">
-        {artifacts.map((artifact) => (
-          <button
-            key={artifact.id}
-            onClick={() => onSelect(artifact.id)}
-            className={`shrink-0 px-3 py-1 text-sm rounded-full transition-colors cursor-pointer ${
-              artifact.id === selectedId
-                ? "bg-primary/15 text-primary font-medium"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {artifact.title}
-          </button>
-        ))}
+    <div
+      className="border-l border-border flex flex-col overflow-hidden transition-[width] duration-300 ease-in-out shrink-0 relative"
+      style={{ width: collapsed ? 40 : "50%" }}
+    >
+      {/* Collapsed: just the expand button */}
+      <div
+        className="flex flex-col items-center pt-2 absolute inset-0 transition-opacity duration-200"
+        style={{ opacity: collapsed ? 1 : 0, pointerEvents: collapsed ? "auto" : "none" }}
+      >
+        <Button variant="ghost" size="icon-sm" onClick={onToggleCollapse}>
+          <PanelRight className="h-4 w-4" />
+        </Button>
       </div>
 
-      {selected ? (
-        <>
-          {/* Version nav — only when multiple versions */}
-          {selected.versions.length > 1 && (
-            <div className="flex items-center justify-end gap-1 px-4 py-2 text-sm text-muted-foreground">
-              <span>
-                v{selected.currentVersion + 1}/{selected.versions.length}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                disabled={selected.currentVersion === 0}
-                onClick={() =>
-                  onVersionChange(selected.id, selected.currentVersion - 1)
-                }
+      {/* Expanded content */}
+      <div
+        className="flex flex-col h-full min-w-0 transition-opacity duration-200"
+        style={{ opacity: collapsed ? 0 : 1, pointerEvents: collapsed ? "none" : "auto" }}
+      >
+        {/* Artifact tabs at top */}
+        <div className="border-b border-border px-3 py-2 flex items-center gap-1 overflow-x-auto">
+          <div className="flex gap-1 flex-1 overflow-x-auto">
+            {artifacts.map((artifact) => (
+              <button
+                key={artifact.id}
+                onClick={() => onSelect(artifact.id)}
+                className={`shrink-0 px-3 py-1 text-sm rounded-full transition-colors cursor-pointer ${
+                  artifact.id === selectedId
+                    ? "bg-primary/15 text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                &lt;
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                disabled={
-                  selected.currentVersion === selected.versions.length - 1
-                }
-                onClick={() =>
-                  onVersionChange(selected.id, selected.currentVersion + 1)
-                }
-              >
-                &gt;
-              </Button>
-            </div>
+                {artifact.title}
+              </button>
+            ))}
+          </div>
+          {onToggleCollapse && (
+            <Button variant="ghost" size="icon-sm" className="shrink-0" onClick={onToggleCollapse}>
+              <PanelRightClose className="h-4 w-4" />
+            </Button>
           )}
-
-          {/* Content */}
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="p-4 space-y-4">
-              {/* Table (interactive) */}
-              {selected.versions[selected.currentVersion].table && (
-                <DataTable spec={selected.versions[selected.currentVersion].table!} />
-              )}
-              {/* Chart (interactive) */}
-              {!selected.versions[selected.currentVersion].table &&
-                selected.versions[selected.currentVersion].chart && (
-                <DataChart spec={selected.versions[selected.currentVersion].chart!} />
-              )}
-              {/* Chart images (matplotlib fallback) */}
-              {!selected.versions[selected.currentVersion].chart &&
-                selected.versions[selected.currentVersion].images?.map(
-                  (img, i) => <ChartImage key={i} src={img} />
-                )}
-              {/* Text content */}
-              {!selected.versions[selected.currentVersion].chart &&
-                !selected.versions[selected.currentVersion].images?.length &&
-                selected.versions[selected.currentVersion].content && (
-                  <Markdown>
-                    {selected.versions[selected.currentVersion].content}
-                  </Markdown>
-                )}
-              {selected.versions[selected.currentVersion].code && (
-                <CodeBlock
-                  code={selected.versions[selected.currentVersion].code!}
-                />
-              )}
-            </div>
-          </ScrollArea>
-        </>
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-          Select an artifact to view
         </div>
-      )}
+
+        {selected ? (
+          <>
+            {/* Version nav — only when multiple versions */}
+            {selected.versions.length > 1 && (
+              <div className="flex items-center justify-end gap-1 px-4 py-2 text-sm text-muted-foreground">
+                <span>
+                  v{selected.currentVersion + 1}/{selected.versions.length}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={selected.currentVersion === 0}
+                  onClick={() =>
+                    onVersionChange(selected.id, selected.currentVersion - 1)
+                  }
+                >
+                  &lt;
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={
+                    selected.currentVersion === selected.versions.length - 1
+                  }
+                  onClick={() =>
+                    onVersionChange(selected.id, selected.currentVersion + 1)
+                  }
+                >
+                  &gt;
+                </Button>
+              </div>
+            )}
+
+            {/* Content */}
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="p-4 space-y-4">
+                {/* Table (interactive) */}
+                {selected.versions[selected.currentVersion].table && (
+                  <DataTable spec={selected.versions[selected.currentVersion].table!} />
+                )}
+                {/* Chart (interactive) */}
+                {!selected.versions[selected.currentVersion].table &&
+                  selected.versions[selected.currentVersion].chart && (
+                  <DataChart spec={selected.versions[selected.currentVersion].chart!} />
+                )}
+                {/* Chart images (matplotlib fallback) */}
+                {!selected.versions[selected.currentVersion].chart &&
+                  selected.versions[selected.currentVersion].images?.map(
+                    (img, i) => <ChartImage key={i} src={img} />
+                  )}
+                {/* Text content */}
+                {!selected.versions[selected.currentVersion].chart &&
+                  !selected.versions[selected.currentVersion].images?.length &&
+                  selected.versions[selected.currentVersion].content && (
+                    <Markdown>
+                      {selected.versions[selected.currentVersion].content}
+                    </Markdown>
+                  )}
+                {selected.versions[selected.currentVersion].code && (
+                  <CodeBlock
+                    code={selected.versions[selected.currentVersion].code!}
+                  />
+                )}
+              </div>
+            </ScrollArea>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+            Select an artifact to view
+          </div>
+        )}
+      </div>
     </div>
   );
 }
