@@ -25,6 +25,16 @@ just test             # Run backend tests
 just evals            # Run evals (real LLM + E2B calls)
 ```
 
+## Git Workflow — Atomic Commits
+
+- Commit after each completed logical subtask, not at the end of implementation
+- Each commit should be one self-contained change that passes tests independently
+- Never mix refactoring with feature work in the same commit
+- Use conventional commit messages: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`
+- Workflow per subtask: implement → verify/test → commit → next subtask
+- If a task has multiple logical steps, each step gets its own commit
+- The test: if you need "and" to describe the commit, split it into two
+
 ## When I say "make a target for that"
 
 - Create a recipe in the root `justfile`
