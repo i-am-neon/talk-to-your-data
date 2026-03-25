@@ -164,6 +164,7 @@ export function useChat(
                   ? event.images
                   : undefined,
               error: event.error || undefined,
+              errorCode: event.error_code ?? undefined,
               artifactId: event.artifact?.id,
             };
             return updated;

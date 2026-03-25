@@ -52,6 +52,7 @@ export interface Message {
   chart?: ChartSpec;
   images?: string[];
   error?: string;
+  errorCode?: string;
   artifactId?: string; // links message to a workspace artifact
   steps?: ThinkingStep[];
 }
@@ -71,6 +72,7 @@ export interface QueryResponse {
   table: TableSpec | null;
   images: string[];
   error: string | null;
+  error_code: string | null;
   artifact: ArtifactMeta | null;
   conversation_id: string;
 }
@@ -132,4 +134,5 @@ export type StreamEvent =
       images: string[];
       artifact: ArtifactMeta | null;
       error: string | null;
+      error_code?: string | null;
     };
