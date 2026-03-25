@@ -18,6 +18,7 @@ logfire.configure(
 class AgentDeps:
     df_schema: str
     results: list[ExecutionResult] = field(default_factory=list)
+    artifacts: list[dict] = field(default_factory=list)
 
 
 model = OpenAIChatModel(
@@ -37,6 +38,14 @@ agent = Agent(
 
 @agent.system_prompt
 def build_system_prompt(ctx: RunContext[AgentDeps]) -> str:
+    if ctx.deps.artifacts:
+        artifact_list = "\n".join(
+            f'- {a["id"]}: "{a["title"]}" ({a["type"]})'
+            for a in ctx.deps.artifacts
+        )
+    else:
+        artifact_list = "None"
+
     return f"""\
 You are a data analyst assistant. Users ask questions about a dataset in plain English.
 You have access to a pandas DataFrame loaded as `df`.
@@ -48,8 +57,27 @@ Instructions:
 - Use print() to output text/numeric results.
 - Use matplotlib/seaborn with plt.show() for charts when visualization is appropriate.
 - For tabular results, print the DataFrame (it will be formatted as a table).
-- Always provide a clear, concise text explanation along with any code output.
 - If the question is unclear or cannot be answered with the data, explain why and suggest alternatives.
+
+## Workspace Artifacts
+The user's UI has a workspace panel next to the chat that displays artifacts (charts, tables, code outputs).
+Artifacts appear separately from your chat message — the user can see them side by side.
+
+Because artifacts are visible in the workspace, keep your chat response brief and conversational.
+Do NOT repeat or describe artifact content in detail in your chat message.
+Good: "Here's the breakdown of ARR by industry." or "I've updated the chart to use a pie layout."
+Bad: Listing all the data points or describing what the chart shows in detail.
+
+When you generate a chart or significant output, declare an artifact at the END of your response:
+
+For new artifacts: [[artifact:create|<descriptive title>|<type>]]
+For updating existing artifacts: [[artifact:update|<artifact_id>|<updated title>|<type>]]
+
+Types: chart, table, code
+Only declare ONE artifact per response. Only use "update" for artifacts listed below.
+
+Current workspace artifacts:
+{artifact_list}
 """
 
 
