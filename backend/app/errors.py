@@ -27,6 +27,7 @@ USER_MESSAGES: dict[ErrorCode, str] = {
 }
 
 MAX_QUESTION_LENGTH = 2000
+REQUEST_TIMEOUT_SECONDS = 120  # 2 minutes
 
 
 def classify_error(exc: Exception) -> tuple[ErrorCode, str]:

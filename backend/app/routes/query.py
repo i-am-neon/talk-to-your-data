@@ -1,4 +1,5 @@
 # backend/app/routes/query.py
+import asyncio
 import json
 import re
 import uuid
@@ -18,7 +19,7 @@ from pydantic_ai.messages import (
 from app.agent.agent import agent, AgentDeps, make_model
 from app import db
 from app.data.loader import load_dataset, get_schema_summary
-from app.errors import ErrorCode, USER_MESSAGES, MAX_QUESTION_LENGTH, classify_error
+from app.errors import ErrorCode, USER_MESSAGES, MAX_QUESTION_LENGTH, classify_error, REQUEST_TIMEOUT_SECONDS
 
 router = APIRouter()
 
@@ -178,8 +179,9 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
     )
 
     try:
-        override_model = make_model(req.model) if req.model else None
-        result = await agent.run(req.question, deps=deps, message_history=message_history, model=override_model)
+        async with asyncio.timeout(REQUEST_TIMEOUT_SECONDS):
+            override_model = make_model(req.model) if req.model else None
+            result = await agent.run(req.question, deps=deps, message_history=message_history, model=override_model)
 
         code = ""
         images: list[str] = []
@@ -257,87 +259,88 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
             full_text = ""
             results_seen = 0
 
-            async for event in agent.run_stream_events(
-                req.question, deps=deps, message_history=message_history, model=override_model,
-            ):
-                if isinstance(event, PartStartEvent):
-                    if isinstance(event.part, ThinkingPart) and event.part.content:
-                        yield _sse_event({"type": "thinking", "content": event.part.content})
-                    elif isinstance(event.part, TextPart) and event.part.content:
-                        full_text += event.part.content
-                        yield _sse_event({"type": "text_delta", "content": event.part.content})
+            async with asyncio.timeout(REQUEST_TIMEOUT_SECONDS):
+                async for event in agent.run_stream_events(
+                    req.question, deps=deps, message_history=message_history, model=override_model,
+                ):
+                    if isinstance(event, PartStartEvent):
+                        if isinstance(event.part, ThinkingPart) and event.part.content:
+                            yield _sse_event({"type": "thinking", "content": event.part.content})
+                        elif isinstance(event.part, TextPart) and event.part.content:
+                            full_text += event.part.content
+                            yield _sse_event({"type": "text_delta", "content": event.part.content})
 
-                elif isinstance(event, PartDeltaEvent):
-                    if isinstance(event.delta, ThinkingPartDelta) and event.delta.content_delta:
-                        yield _sse_event({"type": "thinking", "content": event.delta.content_delta})
-                    elif isinstance(event.delta, TextPartDelta) and event.delta.content_delta:
-                        full_text += event.delta.content_delta
-                        yield _sse_event({"type": "text_delta", "content": event.delta.content_delta})
+                    elif isinstance(event, PartDeltaEvent):
+                        if isinstance(event.delta, ThinkingPartDelta) and event.delta.content_delta:
+                            yield _sse_event({"type": "thinking", "content": event.delta.content_delta})
+                        elif isinstance(event.delta, TextPartDelta) and event.delta.content_delta:
+                            full_text += event.delta.content_delta
+                            yield _sse_event({"type": "text_delta", "content": event.delta.content_delta})
 
-                elif isinstance(event, FunctionToolCallEvent):
-                    tool_code = _extract_tool_code(event.part.args)
-                    yield _sse_event({"type": "tool_call_start", "tool": event.part.tool_name, "code": tool_code})
+                    elif isinstance(event, FunctionToolCallEvent):
+                        tool_code = _extract_tool_code(event.part.args)
+                        yield _sse_event({"type": "tool_call_start", "tool": event.part.tool_name, "code": tool_code})
 
-                elif isinstance(event, FunctionToolResultEvent):
-                    if len(deps.results) > results_seen:
-                        last_result = deps.results[-1]
-                        results_seen = len(deps.results)
-                        if isinstance(event.result, RetryPromptPart):
-                            yield _sse_event({"type": "tool_error", "error": last_result.error or "Unknown error"})
-                        else:
-                            yield _sse_event({
-                                "type": "tool_result",
-                                "stdout": last_result.stdout,
-                                "images": last_result.images,
-                                "charts_count": len(last_result.images),
-                            })
+                    elif isinstance(event, FunctionToolResultEvent):
+                        if len(deps.results) > results_seen:
+                            last_result = deps.results[-1]
+                            results_seen = len(deps.results)
+                            if isinstance(event.result, RetryPromptPart):
+                                yield _sse_event({"type": "tool_error", "error": last_result.error or "Unknown error"})
+                            else:
+                                yield _sse_event({
+                                    "type": "tool_result",
+                                    "stdout": last_result.stdout,
+                                    "images": last_result.images,
+                                    "charts_count": len(last_result.images),
+                                })
 
-                elif isinstance(event, AgentRunResultEvent):
-                    code = ""
-                    images: list[str] = []
-                    chart_dict = None
-                    table_dict = None
-                    for r in deps.results:
-                        if r.code:
-                            code = r.code
-                        if r.images:
-                            images.extend(r.images)
-                        if r.chart is not None and chart_dict is None:
-                            try:
-                                ChartSpec(**r.chart)  # validate
-                                chart_dict = r.chart
-                            except Exception:
-                                pass
-                        if r.table is not None and table_dict is None:
-                            try:
-                                TableSpec(**r.table)  # validate
-                                table_dict = r.table
-                            except Exception:
-                                pass
+                    elif isinstance(event, AgentRunResultEvent):
+                        code = ""
+                        images: list[str] = []
+                        chart_dict = None
+                        table_dict = None
+                        for r in deps.results:
+                            if r.code:
+                                code = r.code
+                            if r.images:
+                                images.extend(r.images)
+                            if r.chart is not None and chart_dict is None:
+                                try:
+                                    ChartSpec(**r.chart)  # validate
+                                    chart_dict = r.chart
+                                except Exception:
+                                    pass
+                            if r.table is not None and table_dict is None:
+                                try:
+                                    TableSpec(**r.table)  # validate
+                                    table_dict = r.table
+                                except Exception:
+                                    pass
 
-                    existing_ids = {d["artifact_id"] for d in artifact_descriptors}
-                    answer_text, artifact = _parse_artifact(full_text, existing_ids)
+                        existing_ids = {d["artifact_id"] for d in artifact_descriptors}
+                        answer_text, artifact = _parse_artifact(full_text, existing_ids)
 
-                    if artifact is None and table_dict:
-                        table_title = next((r.table.get("title", "Table") for r in deps.results if r.table), "Table")
-                        artifact = ArtifactMeta(id=f"artifact-{uuid.uuid4().hex[:8]}", title=table_title, type="table", action="create")
-                    elif artifact is None and (images or chart_dict):
-                        artifact = ArtifactMeta(id=f"artifact-{uuid.uuid4().hex[:8]}", title="Chart", type="chart", action="create")
+                        if artifact is None and table_dict:
+                            table_title = next((r.table.get("title", "Table") for r in deps.results if r.table), "Table")
+                            artifact = ArtifactMeta(id=f"artifact-{uuid.uuid4().hex[:8]}", title=table_title, type="table", action="create")
+                        elif artifact is None and (images or chart_dict):
+                            artifact = ArtifactMeta(id=f"artifact-{uuid.uuid4().hex[:8]}", title="Chart", type="chart", action="create")
 
-                    yield _sse_event({
-                        "type": "done",
-                        "answer": answer_text, "code": code,
-                        "chart": chart_dict, "table": table_dict,
-                        "images": images,
-                        "artifact": artifact.model_dump() if artifact else None,
-                        "error": None, "error_code": None, "conversation_id": str(conv_id),
-                    })
+                        yield _sse_event({
+                            "type": "done",
+                            "answer": answer_text, "code": code,
+                            "chart": chart_dict, "table": table_dict,
+                            "images": images,
+                            "artifact": artifact.model_dump() if artifact else None,
+                            "error": None, "error_code": None, "conversation_id": str(conv_id),
+                        })
 
-                    await _persist_response(
-                        conv_id, req.question, answer_text, code, images, chart_dict, table_dict,
-                        artifact, is_first_message=message_history is None,
-                        pydantic_messages_json=event.result.all_messages_json(),
-                    )
+                        await _persist_response(
+                            conv_id, req.question, answer_text, code, images, chart_dict, table_dict,
+                            artifact, is_first_message=message_history is None,
+                            pydantic_messages_json=event.result.all_messages_json(),
+                        )
 
         except Exception as e:
             error_code, error_msg = classify_error(e)
