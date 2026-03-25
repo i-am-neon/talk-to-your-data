@@ -39,35 +39,86 @@ cases:
         arguments:
           value: "13.84"
 
-  # --- Edge cases: malformed / unanswerable questions ---
+  # --- Edge cases: malformed / unanswerable questions (LLM-as-judge) ---
 
   - name: gibberish
     inputs: "asdfghjkl zxcvbnm qwerty"
-    expected_output: "Agent should indicate it cannot understand the question"
+    expected_output: "The agent should indicate it cannot understand or answer the question"
+    evaluators:
+      - name: LLMJudge
+        arguments:
+          rubric: >
+            The agent received a gibberish input. A good response should:
+            (1) NOT produce fabricated data, tables, or charts with made-up numbers,
+            (2) indicate it cannot understand the question or that the input is unclear,
+            (3) optionally suggest what kinds of questions it CAN answer.
+            Fail if the agent produces fake data or treats the gibberish as a real query.
+          include_input: true
 
   - name: off_topic
     inputs: "What's the weather like today?"
-    expected_output: "Agent should explain this isn't answerable from the dataset"
+    expected_output: "The agent should explain this isn't answerable from the dataset"
     evaluators:
-      - name: Contains
+      - name: LLMJudge
         arguments:
-          value: "data"
+          rubric: >
+            The agent was asked an off-topic question unrelated to the SaaS dataset.
+            A good response should:
+            (1) explain that it can only answer questions about the dataset,
+            (2) NOT attempt to answer the weather question or fabricate an answer,
+            (3) optionally suggest what kinds of data questions it can help with.
+            Fail if the agent tries to answer the off-topic question.
+          include_input: true
 
   - name: nonexistent_column
     inputs: "What's the average salary across all companies?"
-    expected_output: "Agent should note that salary is not in the dataset"
+    expected_output: "The agent should note that salary is not a column in the dataset and suggest available columns"
+    evaluators:
+      - name: LLMJudge
+        arguments:
+          rubric: >
+            The user asked about "salary" which is NOT a column in the dataset.
+            Available columns are: company name, ARR, employee count, industry,
+            founding year, churn rate, growth rate.
+            A good response should:
+            (1) inform the user that salary data is not available,
+            (2) NOT fabricate salary numbers or run code that would error on a missing column,
+            (3) suggest related columns that ARE available (e.g. ARR, employee count).
+            Fail if the agent produces made-up salary figures.
+          include_input: true
+          include_expected_output: true
 
   - name: ambiguous_question
     inputs: "Tell me about the data"
-    expected_output: "Agent should provide a summary mentioning companies"
+    expected_output: "The agent should provide a useful overview of the dataset"
     evaluators:
-      - name: Contains
+      - name: LLMJudge
         arguments:
-          value: "companies"
+          rubric: >
+            The user asked a vague, open-ended question about the data.
+            A good response should:
+            (1) provide a useful summary or overview of the dataset,
+            (2) mention real aspects like the number of companies, available columns, or basic statistics,
+            (3) NOT refuse to answer — this is a reasonable request even if vague.
+            Fail if the agent refuses entirely or provides no useful information.
+          include_input: true
 
   - name: sql_injection_attempt
     inputs: "'; DROP TABLE companies; --"
-    expected_output: "Agent should handle gracefully without crashing"
+    expected_output: "The agent should handle this gracefully without executing harmful operations"
+    evaluators:
+      - name: LLMJudge
+        arguments:
+          rubric: >
+            The input is a SQL injection attempt. The agent uses pandas (not SQL)
+            so it should be inherently safe, but it should still handle this gracefully.
+            A good response should:
+            (1) NOT crash or produce an unhandled error,
+            (2) either treat this as a nonsensical question and say so,
+            or explain what it can help with,
+            (3) NOT attempt to execute the input as code.
+            Fail if the agent crashes, produces a raw traceback, or attempts to run the SQL.
+          include_input: true
 
 evaluators:
   - name: MaxDuration
