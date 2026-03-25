@@ -122,7 +122,8 @@ export function WorkspacePanel({
                     (img, i) => <ChartImage key={i} src={img} />
                   )}
                 {/* Text content */}
-                {!selected.versions[selected.currentVersion].chart &&
+                {!selected.versions[selected.currentVersion].table &&
+                  !selected.versions[selected.currentVersion].chart &&
                   !selected.versions[selected.currentVersion].images?.length &&
                   selected.versions[selected.currentVersion].content && (
                     <Markdown>
