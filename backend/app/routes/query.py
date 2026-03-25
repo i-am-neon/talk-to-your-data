@@ -326,7 +326,7 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
                         "chart": chart_dict, "table": table_dict,
                         "images": images,
                         "artifact": artifact.model_dump() if artifact else None,
-                        "error": None, "conversation_id": str(conv_id),
+                        "error": None, "error_code": None, "conversation_id": str(conv_id),
                     })
 
                     await _persist_response(
