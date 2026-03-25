@@ -11,6 +11,7 @@ from app.routes.conversations import router as conversations_router
 
 logfire.configure(
     token=settings.logfire_token or None,
+    environment=settings.logfire_environment,
 )
 logfire.instrument_pydantic_ai()
 logfire.instrument_asyncpg()

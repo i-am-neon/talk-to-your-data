@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     litellm_model: str = SONNET_4_6
     e2b_api_key: str
     logfire_token: str = ""
+    logfire_environment: str = "local"
     frontend_url: str = "*"
     database_url: str = ""
 

@@ -9,7 +9,7 @@ Ask questions about a SaaS dataset in plain English. Get text, interactive chart
 | Layer | Tech |
 |-------|------|
 | Frontend | Vite + React + TypeScript + shadcn/ui → Vercel |
-| Backend | FastAPI + PydanticAI + PostgreSQL → Railway |
+| Backend | FastAPI + PydanticAI + Logfire + PostgreSQL → Railway |
 | Sandbox | E2B Code Interpreter (Firecracker microVMs) |
 | LLM | Genesis LiteLLM Proxy (OpenAI-compatible) |
 
@@ -17,7 +17,7 @@ Ask questions about a SaaS dataset in plain English. Get text, interactive chart
 
 ## AI Tools Used
 
-Claude Code (Opus 4.6, 1M context, max thinking) for everything. I use Anthropic's "superpowers" skill pack to force structured brainstorming before implementation, letting the agent plan and execute 10+ minute runs autonomously. I also gave it CLI skills for Railway, Vercel, shadcn/ui, and Playwright so it can deploy, scaffold UI, and visually verify its own work without me in the loop.
+Claude Code (Opus 4.6, 1M context, max thinking) for everything. I use Anthropic's "superpowers" skill pack to force structured brainstorming before implementation, letting the agent plan and execute 15+ minute runs autonomously. I also gave it CLI skills for Railway, Vercel, shadcn/ui, and Playwright so it can deploy, scaffold UI, and visually verify its own work without me in the loop.
 
 ## Interesting Challenges
 
