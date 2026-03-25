@@ -3,7 +3,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatInput } from "./components/ChatInput";
 import { ChatMessage } from "./components/ChatMessage";
 import { EmptyState } from "./components/EmptyState";
-import { TypingIndicator } from "./components/TypingIndicator";
 import { WorkspacePanel } from "./components/WorkspacePanel";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Sidebar } from "./components/Sidebar";
@@ -66,7 +65,7 @@ export default function App() {
       />
 
       {/* Chat panel */}
-      <div className={`flex flex-col transition-all duration-300 ${hasArtifacts ? "w-1/2" : "flex-1 max-w-2xl mx-auto"}`}>
+      <div className={`flex flex-col min-h-0 transition-all duration-300 ${hasArtifacts ? "w-1/2" : "flex-1 max-w-2xl mx-auto"}`}>
         <div className="flex items-center justify-end px-4 py-2">
           <ThemeToggle theme={theme} onChange={setTheme} />
         </div>

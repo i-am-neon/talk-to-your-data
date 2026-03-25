@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CodeBlock } from "./CodeBlock";
 import { ChartImage } from "./ChartImage";
 import { DataChart } from "./DataChart";
+import { DataTable } from "./DataTable";
 import { Markdown } from "./Markdown";
 import type { Artifact } from "../types";
 
@@ -76,8 +77,13 @@ export function WorkspacePanel({
           {/* Content */}
           <ScrollArea className="flex-1 min-h-0">
             <div className="p-4 space-y-4">
+              {/* Table (interactive) */}
+              {selected.versions[selected.currentVersion].table && (
+                <DataTable spec={selected.versions[selected.currentVersion].table!} />
+              )}
               {/* Chart (interactive) */}
-              {selected.versions[selected.currentVersion].chart && (
+              {!selected.versions[selected.currentVersion].table &&
+                selected.versions[selected.currentVersion].chart && (
                 <DataChart spec={selected.versions[selected.currentVersion].chart!} />
               )}
               {/* Chart images (matplotlib fallback) */}

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { Artifact, ArtifactMeta, ArtifactVersion, ChartSpec } from "../types";
+import type { Artifact, ArtifactMeta, ArtifactVersion, ChartSpec, TableSpec } from "../types";
 
 export function useArtifacts() {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
@@ -7,12 +7,13 @@ export function useArtifacts() {
 
   const processArtifact = useCallback((
     meta: ArtifactMeta,
-    content: { answer: string; code?: string; chart?: ChartSpec; images?: string[] }
+    content: { answer: string; code?: string; chart?: ChartSpec; table?: TableSpec; images?: string[] }
   ) => {
     const version: ArtifactVersion = {
       content: content.answer,
       code: content.code,
       chart: content.chart,
+      table: content.table,
       images: content.images,
       timestamp: Date.now(),
     };
@@ -62,6 +63,7 @@ export function useArtifacts() {
         content: "",
         code: a.code || undefined,
         chart: a.chart || undefined,
+        table: a.table || undefined,
         images: a.images || undefined,
         timestamp: new Date(a.created_at).getTime(),
       });

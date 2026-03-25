@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass
 
+import logfire
 from e2b_code_interpreter import Sandbox
 
 from app.config import settings
@@ -28,6 +29,13 @@ def print_chart(chart_type, data, x_key, series, **kwargs):
         **kwargs
     }))
 
+def print_table(df, title="Table"):
+    print("__TABLE_JSON__" + _json.dumps({
+        "columns": [{"key": c, "label": c, "dtype": str(df[c].dtype)} for c in df.columns],
+        "rows": df.to_dict(orient="records"),
+        "title": title
+    }))
+
 df = pd.read_csv('/tmp/data.csv')
 """
 
@@ -42,6 +50,7 @@ class ExecutionResult:
     code: str = ""
     error: str | None = None
     chart: dict | None = None
+    table: dict | None = None
 
 
 def _parse_chart_from_stdout(stdout: str) -> tuple[str, dict | None]:
@@ -59,6 +68,22 @@ def _parse_chart_from_stdout(stdout: str) -> tuple[str, dict | None]:
     return "\n".join(clean_lines), chart
 
 
+def _parse_table_from_stdout(stdout: str) -> tuple[str, dict | None]:
+    """Extract __TABLE_JSON__ from stdout. Returns (clean_stdout, table_dict_or_None)."""
+    table = None
+    clean_lines = []
+    for line in stdout.splitlines():
+        if line.startswith("__TABLE_JSON__"):
+            try:
+                table = json.loads(line[len("__TABLE_JSON__"):])
+            except json.JSONDecodeError:
+                clean_lines.append(line)
+        else:
+            clean_lines.append(line)
+    return "\n".join(clean_lines), table
+
+
+@logfire.instrument("E2B sandbox execution")
 def execute_python_code(code: str) -> ExecutionResult:
     """Execute Python code in an E2B sandbox. Returns structured result."""
     sbx = Sandbox.create(api_key=settings.e2b_api_key, timeout=60)
@@ -76,8 +101,9 @@ def execute_python_code(code: str) -> ExecutionResult:
         stdout = "\n".join(execution.logs.stdout)
         stderr = "\n".join(execution.logs.stderr)
 
-        # Parse chart JSON from stdout (before truncation to avoid losing marker)
+        # Parse chart/table JSON from stdout (before truncation to avoid losing marker)
         stdout, chart = _parse_chart_from_stdout(stdout)
+        stdout, table = _parse_table_from_stdout(stdout)
 
         # Truncate long output
         if len(stdout) > MAX_OUTPUT_LENGTH:
@@ -102,6 +128,7 @@ def execute_python_code(code: str) -> ExecutionResult:
             code=code,
             error=error,
             chart=chart,
+            table=table,
         )
 
     finally:

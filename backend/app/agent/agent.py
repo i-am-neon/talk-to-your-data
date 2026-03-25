@@ -1,17 +1,11 @@
 from dataclasses import dataclass, field
 
-import logfire
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from app.agent.tools import execute_python_code, ExecutionResult
 from app.config import settings, MODEL_IDS
-
-logfire.configure(
-    token=settings.logfire_token if settings.logfire_token else None,
-    send_to_logfire=bool(settings.logfire_token),
-)
 
 
 @dataclass
@@ -67,7 +61,10 @@ You have access to a pandas DataFrame loaded as `df`.
                 series=[{{"key": "revenue", "label": "Revenue"}}])
   The frontend renders these as interactive charts. Do NOT use plt.show() for these types.
 - For complex visualizations (heatmaps, violin plots, multi-axis, annotations), use matplotlib with plt.show().
-- For tabular results, print the DataFrame.
+- For tabular results, use print_table() to send structured data to the workspace:
+    result = df.groupby("industry")["arr"].mean().reset_index()
+    print_table(result, "Average ARR by Industry")
+  Do NOT use print(df) for tables — print_table() renders an interactive table in the workspace.
 - If the question cannot be answered with the available data, say so and suggest what you can answer.
 
 ## Tone
@@ -105,6 +102,7 @@ def run_code(ctx: RunContext[AgentDeps], code: str) -> str:
 
     The DataFrame is pre-loaded as `df`. pandas, numpy, matplotlib, and seaborn are available.
     Use print_chart() for standard charts (bar, line, area, pie, radar).
+    Use print_table(df, title) for tabular results.
     Use plt.show() only for complex visualizations. Use print() for text results.
 
     Args:
@@ -123,6 +121,8 @@ def run_code(ctx: RunContext[AgentDeps], code: str) -> str:
     response_parts = []
     if result.stdout:
         response_parts.append(f"Output:\n{result.stdout}")
+    if result.table:
+        response_parts.append("Interactive table generated and will be shown to the user in the workspace.")
     if result.chart:
         response_parts.append("Interactive chart generated and will be shown to the user.")
     if result.images:

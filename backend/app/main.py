@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import logfire
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,6 +8,12 @@ from app import db
 from app.config import settings
 from app.routes.query import router as query_router
 from app.routes.conversations import router as conversations_router
+
+logfire.configure(
+    token=settings.logfire_token if settings.logfire_token else None,
+    send_to_logfire=bool(settings.logfire_token),
+)
+logfire.instrument_asyncpg()
 
 
 @asynccontextmanager
@@ -18,6 +25,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Data Agent API", lifespan=lifespan)
+logfire.instrument_fastapi(app)
 
 app.add_middleware(
     CORSMiddleware,

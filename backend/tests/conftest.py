@@ -1,19 +1,20 @@
 import os
 import uuid
+from pathlib import Path
 
 import asyncpg
 import pytest
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://localhost:5432/dataagent_test")
+MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
 
 
 @pytest.fixture(scope="session")
 async def db_pool():
     pool = await asyncpg.create_pool(DATABASE_URL)
-    migration_path = os.path.join(os.path.dirname(__file__), "..", "migrations", "001_create_tables.sql")
     async with pool.acquire() as conn:
-        with open(migration_path) as f:
-            await conn.execute(f.read())
+        for sql_file in sorted(MIGRATIONS_DIR.glob("*.sql")):
+            await conn.execute(sql_file.read_text())
     yield pool
     await pool.close()
 

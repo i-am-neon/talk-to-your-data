@@ -46,6 +46,8 @@ export function queryAgentStream(
           type: "done",
           answer: "",
           code: "",
+          chart: null,
+          table: null,
           images: [],
           artifact: null,
           error: `API error: ${response.status}`,

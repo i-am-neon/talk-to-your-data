@@ -10,10 +10,22 @@ export interface ChartSpec {
   series: ChartSeries[];
 }
 
+export interface ColumnDef {
+  key: string;
+  label: string;
+  dtype: string;
+}
+
+export interface TableSpec {
+  columns: ColumnDef[];
+  rows: Record<string, unknown>[];
+}
+
 export interface ArtifactVersion {
   content: string; // answer text associated with this version
   code?: string;
   chart?: ChartSpec;
+  table?: TableSpec;
   images?: string[];
   timestamp: number;
 }
@@ -56,6 +68,7 @@ export interface QueryResponse {
   answer: string;
   code: string;
   chart: ChartSpec | null;
+  table: TableSpec | null;
   images: string[];
   error: string | null;
   artifact: ArtifactMeta | null;
@@ -77,6 +90,7 @@ export interface ConversationDetail extends ConversationSummary {
     code: string | null;
     images: string[] | null;
     chart: ChartSpec | null;
+    table: TableSpec | null;
     artifact: ArtifactMeta | null;
     created_at: string;
   }[];
@@ -89,6 +103,7 @@ export interface ConversationDetail extends ConversationSummary {
     code: string | null;
     images: string[] | null;
     chart: ChartSpec | null;
+    table: TableSpec | null;
     created_at: string;
   }[];
 }
@@ -113,6 +128,7 @@ export type StreamEvent =
       answer: string;
       code: string;
       chart: ChartSpec | null;
+      table: TableSpec | null;
       images: string[];
       artifact: ArtifactMeta | null;
       error: string | null;
