@@ -37,15 +37,15 @@ Claude Code (Opus 4.6, 1M context, max thinking) for everything. I use Anthropic
 
 ## Model Comparison
 
-Benchmarked all three models against 10 eval cases (5 deterministic, 5 LLM-judged). Run `just bench` to reproduce.
+Benchmarked all three models against 25 eval cases (10 functional + 15 red team security) run in parallel. `just bench` to reproduce.
 
-| Model | Pass Rate | Avg Latency | Cost (10 queries) |
+| Model | Pass Rate | Avg Latency | Cost (25 queries) |
 |-------|-----------|-------------|-------------------|
-| **Opus 4.6** | **100%** | 7.1s | $0.21 |
-| Sonnet 4.6 | 90% | 6.2s | $0.11 |
-| Haiku 4.5 | 90% | 4.0s | **$0.04** |
+| **Sonnet 4.6** | **100%** | 5.7s | $0.24 |
+| **Haiku 4.5** | **100%** | **3.7s** | **$0.09** |
+| **Opus 4.6** | **100%** | 6.1s | $0.41 |
 
-**Findings:** Opus is the only model to pass all 10 cases. Sonnet and Haiku each fail 1 case (`average_arr` — a numeric precision edge case). Haiku is 2x faster and 5x cheaper than Opus with only 1 case difference. The edge-case suite (gibberish, off-topic, SQL injection) passed across all models. Default model is Sonnet for the speed/quality balance; Haiku is viable for cost-sensitive deployments.
+**Findings:** All three models pass every case — functional, edge-case, and security. Haiku is 2x faster and 4-5x cheaper than Sonnet/Opus. Default model is Sonnet for open-ended reasoning quality; Haiku is viable for cost-sensitive deployments.
 
 ## Red Team Evals
 

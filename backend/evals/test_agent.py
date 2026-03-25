@@ -7,6 +7,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from app.agent.agent import agent, AgentDeps
 from app.config import settings
 from app.data.loader import load_dataset, get_schema_summary
+from evals.evaluators import NumericContains
 
 _df = load_dataset()
 _schema = get_schema_summary(_df)
@@ -27,7 +28,7 @@ async def run_agent(question: str) -> str:
 
 @pytest.mark.asyncio
 async def test_eval():
-    dataset = Dataset.from_file("evals/cases.yaml")
+    dataset = Dataset.from_file("evals/cases.yaml", custom_evaluator_types=[NumericContains])
     report = await dataset.evaluate(run_agent)
     report.print(include_input=True, include_output=True)
     assert not report.failures, f"{len(report.failures)} case(s) failed to execute"

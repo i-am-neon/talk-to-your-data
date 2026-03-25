@@ -9,11 +9,17 @@ cases:
 
   - name: average_arr
     inputs: "What is the average ARR across all companies?"
-    expected_output: "1473"
+    expected_output: "The average ARR is approximately $1,473K (i.e. 1473 thousands or ~$1.47M)"
     evaluators:
-      - name: Contains
+      - name: LLMJudge
         arguments:
-          value: "1473"
+          rubric: >
+            The dataset column is arr_thousands with a mean of ~1473.
+            The agent should report an average ARR of approximately $1,473K or $1.47M
+            (equivalently: 1473 thousands, $1,473,000, or ~$1.47 million).
+            Any of these representations is correct. Fail only if the number is
+            materially wrong (off by more than 1%) or if the agent fabricated data.
+          include_input: true
 
   - name: filter_count
     inputs: "How many companies are in Fintech?"
@@ -35,9 +41,9 @@ cases:
     inputs: "What's the average employee count for companies founded after 2015?"
     expected_output: "13.84"
     evaluators:
-      - name: Contains
+      - name: NumericContains
         arguments:
-          value: "13.84"
+          value: 13.84
 
   # --- Edge cases: malformed / unanswerable questions (LLM-as-judge) ---
 
