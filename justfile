@@ -22,6 +22,14 @@ evals:
 migrate:
     cd backend && psql "$DATABASE_URL" -f migrations/001_create_tables.sql
 
+# Run multi-model benchmark (correctness, speed, cost)
+bench:
+    cd backend && uv run python -m evals.benchmark
+
+# Run red team evals (adversarial security tests)
+red-team:
+    cd backend && uv run pytest evals/test_red_team.py -v
+
 # Install all dependencies
 install:
     cd backend && uv sync

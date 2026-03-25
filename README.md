@@ -9,9 +9,12 @@ Ask questions about a SaaS dataset in plain English. Get text, interactive chart
 | Layer | Tech |
 |-------|------|
 | Frontend | Vite + React + TypeScript + shadcn/ui → Vercel |
-| Backend | FastAPI + PydanticAI + Logfire + PostgreSQL → Railway |
+| Backend | FastAPI + PydanticAI + PostgreSQL → Railway |
 | Sandbox | E2B Code Interpreter (Firecracker microVMs) |
 | LLM | Genesis LiteLLM Proxy (OpenAI-compatible) |
+| Observability | [Logfire](https://logfire-us.pydantic.dev/tommywilczek/genesis-take-home?last=300000) |
+| Evals | pydantic-evals |
+| CI | GitHub CLI |
 
 **Flow:** React UI → PydanticAI agent → LLM generates pandas code → E2B executes → streamed answer + artifacts
 
@@ -31,6 +34,22 @@ Claude Code (Opus 4.6, 1M context, max thinking) for everything. I use Anthropic
 - **Pandas over SQL** — analysis and visualization in one execution context. SQL would need a separate charting pipeline and can't do correlation matrices or custom plots.
 - **Workspace artifacts** — charts and tables are versioned objects, not inline message content. The agent can update an existing artifact ("now color it by industry") and the UI tracks version history.
   - Standard charts/tables render as Recharts/shadcn components matching the design system. Exotic visualizations (heatmaps, violin plots) fall back to matplotlib PNGs.
+
+## Model Comparison
+
+Benchmarked all three models against 10 eval cases (5 deterministic, 5 LLM-judged). Run `just bench` to reproduce.
+
+| Model | Pass Rate | Avg Latency | Cost (10 queries) |
+|-------|-----------|-------------|-------------------|
+| **Opus 4.6** | **100%** | 7.1s | $0.21 |
+| Sonnet 4.6 | 90% | 6.2s | $0.11 |
+| Haiku 4.5 | 90% | 4.0s | **$0.04** |
+
+**Findings:** Opus is the only model to pass all 10 cases. Sonnet and Haiku each fail 1 case (`average_arr` — a numeric precision edge case). Haiku is 2x faster and 5x cheaper than Opus with only 1 case difference. The edge-case suite (gibberish, off-topic, SQL injection) passed across all models. Default model is Sonnet for the speed/quality balance; Haiku is viable for cost-sensitive deployments.
+
+## Red Team Evals
+
+15 adversarial test cases across 4 attack categories (prompt injection, data exfiltration, sandbox abuse, output integrity) using a custom `RedTeamJudge` evaluator. Run `just red-team` to reproduce. Initial run found 2 vulnerabilities (role override compliance, system prompt leakage) — both fixed via system prompt hardening. All 15 cases pass.
 
 ## What I'd Improve
 

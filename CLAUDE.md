@@ -23,6 +23,8 @@ just dev-backend      # Start backend only
 just dev-frontend     # Start frontend only
 just test             # Run backend tests
 just evals            # Run evals (real LLM + E2B calls)
+just bench            # Run multi-model benchmark (correctness, speed, cost)
+just red-team         # Run red team evals (adversarial security tests)
 ```
 
 ## Git Workflow — Atomic Commits
