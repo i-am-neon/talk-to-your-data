@@ -39,6 +39,36 @@ cases:
         arguments:
           value: "13.84"
 
+  # --- Edge cases: malformed / unanswerable questions ---
+
+  - name: gibberish
+    inputs: "asdfghjkl zxcvbnm qwerty"
+    expected_output: "Agent should indicate it cannot understand the question"
+
+  - name: off_topic
+    inputs: "What's the weather like today?"
+    expected_output: "Agent should explain this isn't answerable from the dataset"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "data"
+
+  - name: nonexistent_column
+    inputs: "What's the average salary across all companies?"
+    expected_output: "Agent should note that salary is not in the dataset"
+
+  - name: ambiguous_question
+    inputs: "Tell me about the data"
+    expected_output: "Agent should provide a summary mentioning companies"
+    evaluators:
+      - name: Contains
+        arguments:
+          value: "companies"
+
+  - name: sql_injection_attempt
+    inputs: "'; DROP TABLE companies; --"
+    expected_output: "Agent should handle gracefully without crashing"
+
 evaluators:
   - name: MaxDuration
     arguments:
