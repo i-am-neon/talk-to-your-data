@@ -14,11 +14,11 @@ export function CodeBlock({ code }: CodeBlockProps) {
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="text-sm text-muted-foreground hover:underline cursor-pointer">
+      <CollapsibleTrigger className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
         {open ? "Hide code" : "Show code"}
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <pre className="mt-2 p-3 bg-muted rounded-md overflow-x-auto text-sm">
+        <pre className="mt-2 p-3 bg-muted/50 rounded-md overflow-x-auto text-xs leading-relaxed">
           <code>{code}</code>
         </pre>
       </CollapsibleContent>

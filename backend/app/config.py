@@ -7,6 +7,12 @@ HAIKU_4_5 = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 OPUS_4_5 = "global.anthropic.claude-opus-4-5-20251101-v1:0"
 OPUS_4_6 = "global.anthropic.claude-opus-4-6-v1"
 
+MODEL_IDS: dict[str, str] = {
+    "sonnet": SONNET_4_6,
+    "haiku": HAIKU_4_5,
+    "opus": OPUS_4_6,
+}
+
 
 class Settings(BaseSettings):
     litellm_api_key: str

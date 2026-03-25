@@ -7,7 +7,7 @@ export function ChartImage({ src }: ChartImageProps) {
     <img
       src={`data:image/png;base64,${src}`}
       alt="Chart"
-      className="mt-2 rounded-md max-w-full"
+      className="mt-2 rounded-lg max-w-full"
     />
   );
 }

@@ -6,7 +6,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from app.agent.tools import execute_python_code, ExecutionResult
-from app.config import settings
+from app.config import settings, MODEL_IDS
 
 logfire.configure(
     token=settings.logfire_token if settings.logfire_token else None,
@@ -21,13 +21,18 @@ class AgentDeps:
     artifacts: list[dict] = field(default_factory=list)
 
 
-model = OpenAIChatModel(
-    settings.litellm_model,
-    provider=OpenAIProvider(
-        base_url=settings.litellm_base_url,
-        api_key=settings.litellm_api_key,
-    ),
+_provider = OpenAIProvider(
+    base_url=settings.litellm_base_url,
+    api_key=settings.litellm_api_key,
 )
+
+model = OpenAIChatModel(settings.litellm_model, provider=_provider)
+
+
+def make_model(name: str) -> OpenAIChatModel:
+    """Create a model instance for a given short name (e.g. 'opus', 'sonnet', 'haiku')."""
+    model_id = MODEL_IDS.get(name, settings.litellm_model)
+    return OpenAIChatModel(model_id, provider=_provider)
 
 agent = Agent(
     model,
