@@ -18,6 +18,7 @@ from pydantic_ai.messages import (
 from app.agent.agent import agent, AgentDeps, make_model
 from app import db
 from app.data.loader import load_dataset, get_schema_summary
+from app.errors import ErrorCode, USER_MESSAGES, MAX_QUESTION_LENGTH
 
 router = APIRouter()
 
@@ -72,6 +73,7 @@ class QueryResponse(BaseModel):
     table: TableSpec | None = None
     images: list[str] = []
     error: str | None = None
+    error_code: str | None = None
     artifact: ArtifactMeta | None = None
     conversation_id: str
 
@@ -155,7 +157,17 @@ async def query(req: QueryRequest, x_session_id: uuid.UUID = Header()) -> QueryR
     conv_id = req.conversation_id
 
     if not req.question.strip():
-        return QueryResponse(answer="", error="Please enter a question.", conversation_id=str(conv_id))
+        return QueryResponse(
+            answer="", error=USER_MESSAGES[ErrorCode.EMPTY_QUESTION],
+            error_code=ErrorCode.EMPTY_QUESTION,
+            conversation_id=str(conv_id),
+        )
+    if len(req.question) > MAX_QUESTION_LENGTH:
+        return QueryResponse(
+            answer="", error=USER_MESSAGES[ErrorCode.QUESTION_TOO_LONG],
+            error_code=ErrorCode.QUESTION_TOO_LONG,
+            conversation_id=str(conv_id),
+        )
 
     message_history = await _load_message_history(conv_id)
     artifact_descriptors = await db.get_artifact_descriptors(conv_id)
@@ -221,7 +233,10 @@ async def query_stream(req: QueryRequest, x_session_id: uuid.UUID = Header()) ->
 
     async def event_generator() -> AsyncGenerator[str, None]:
         if not req.question.strip():
-            yield _sse_event({"type": "done", "answer": "", "code": "", "images": [], "artifact": None, "error": "Please enter a question.", "conversation_id": str(conv_id)})
+            yield _sse_event({"type": "done", "answer": "", "code": "", "images": [], "artifact": None, "error": USER_MESSAGES[ErrorCode.EMPTY_QUESTION], "error_code": ErrorCode.EMPTY_QUESTION, "conversation_id": str(conv_id)})
+            return
+        if len(req.question) > MAX_QUESTION_LENGTH:
+            yield _sse_event({"type": "done", "answer": "", "code": "", "images": [], "artifact": None, "error": USER_MESSAGES[ErrorCode.QUESTION_TOO_LONG], "error_code": ErrorCode.QUESTION_TOO_LONG, "conversation_id": str(conv_id)})
             return
 
         message_history = await _load_message_history(conv_id)

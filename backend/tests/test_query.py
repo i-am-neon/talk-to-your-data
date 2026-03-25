@@ -69,7 +69,19 @@ async def test_query_empty_question(client):
     conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
     resp = await client.post("/api/query", json={"question": "", "conversation_id": conv_id}, headers=HEADERS)
     assert resp.status_code == 200
-    assert resp.json()["error"] == "Please enter a question."
+    data = resp.json()
+    assert data["error"] == "Please enter a question."
+    assert data["error_code"] == "empty_question"
+
+
+async def test_query_question_too_long(client):
+    conv_id = (await client.post("/api/conversations", headers=HEADERS)).json()["id"]
+    long_question = "x" * 2001
+    resp = await client.post("/api/query", json={"question": long_question, "conversation_id": conv_id}, headers=HEADERS)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["error_code"] == "question_too_long"
+    assert "too long" in data["error"]
 
 
 async def test_query_saves_messages(client):
