@@ -22,7 +22,7 @@ export function ThemeToggle({
   onChange: (t: Theme) => void;
 }) {
   return (
-    <Select value={theme} onValueChange={onChange}>
+    <Select value={theme} onValueChange={(v) => { if (v) onChange(v as Theme); }}>
       <SelectTrigger size="sm" className="border-none bg-transparent shadow-none text-muted-foreground">
         <SelectValue>
           {options.find((o) => o.value === theme)?.icon}

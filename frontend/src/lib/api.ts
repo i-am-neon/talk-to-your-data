@@ -84,6 +84,8 @@ export function queryAgentStream(
           type: "done",
           answer: "",
           code: "",
+          chart: null,
+          table: null,
           images: [],
           artifact: null,
           error: err instanceof Error ? err.message : "Something went wrong",

@@ -32,6 +32,7 @@ export function useChat(
 
     if (!conversationId) {
       setMessages([]);
+      artifactHandlers.loadFromConversation([]);
       return;
     }
 
@@ -40,6 +41,10 @@ export function useChat(
       skipHistoryRef.current = false;
       return;
     }
+
+    // Clear stale state from previous conversation immediately
+    setMessages([]);
+    artifactHandlers.loadFromConversation([]);
 
     let cancelled = false;
     setIsLoadingHistory(true);
