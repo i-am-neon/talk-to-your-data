@@ -155,7 +155,7 @@ export function useChat(
           updateLastMessage((msg) => {
             const updated: Message = {
               ...msg,
-              content: event.answer ?? msg.content,
+              content: event.error_code === "stream_interrupted" ? (msg.content || event.answer) : (event.answer ?? msg.content),
               code: event.artifact ? undefined : event.code || undefined,
               chart: event.artifact ? undefined : (event.chart ?? undefined),
               images: event.artifact

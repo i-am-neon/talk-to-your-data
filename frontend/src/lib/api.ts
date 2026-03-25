@@ -33,6 +33,8 @@ export function queryAgentStream(
   const controller = new AbortController();
 
   (async () => {
+    let receivedDone = false;
+
     try {
       const response = await fetch(`${API_URL}/api/query/stream`, {
         method: "POST",
@@ -51,6 +53,7 @@ export function queryAgentStream(
           images: [],
           artifact: null,
           error: `API error: ${response.status}`,
+          error_code: response.status === 429 ? "llm_rate_limited" : response.status >= 500 ? "llm_unavailable" : "internal_error",
         });
         return;
       }
@@ -68,6 +71,7 @@ export function queryAgentStream(
         buffer = remainder;
 
         for (const event of events) {
+          if (event.type === "done") receivedDone = true;
           onEvent(event);
         }
       }
@@ -75,8 +79,23 @@ export function queryAgentStream(
       if (buffer.trim()) {
         const { events } = parseSSEChunk("\n", buffer);
         for (const event of events) {
+          if (event.type === "done") receivedDone = true;
           onEvent(event);
         }
+      }
+
+      if (!receivedDone) {
+        onEvent({
+          type: "done",
+          answer: "",
+          code: "",
+          chart: null,
+          table: null,
+          images: [],
+          artifact: null,
+          error: "The response was interrupted. Please try again.",
+          error_code: "stream_interrupted",
+        });
       }
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
@@ -89,6 +108,7 @@ export function queryAgentStream(
           images: [],
           artifact: null,
           error: err instanceof Error ? err.message : "Something went wrong",
+          error_code: "internal_error",
         });
       }
     }
