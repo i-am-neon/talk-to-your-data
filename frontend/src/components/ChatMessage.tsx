@@ -1,8 +1,10 @@
+import { RefreshCw } from "lucide-react";
 import { CodeBlock } from "./CodeBlock";
 import { ChartImage } from "./ChartImage";
 import { DataChart } from "./DataChart";
 import { Markdown } from "./Markdown";
 import { ThinkingSection } from "./ThinkingSection";
+import { isRetryable } from "../lib/errors";
 import type { Message, ThinkingStep } from "../types";
 
 /** Split steps into logical groups — a new group starts when a thinking/retry
@@ -27,9 +29,10 @@ interface ChatMessageProps {
   message: Message;
   isStreaming?: boolean;
   onArtifactClick?: (id: string) => void;
+  onRetry?: () => void;
 }
 
-export function ChatMessage({ message, isStreaming = false, onArtifactClick }: ChatMessageProps) {
+export function ChatMessage({ message, isStreaming = false, onArtifactClick, onRetry }: ChatMessageProps) {
   const isUser = message.role === "user";
   const hasSteps = message.steps && message.steps.length > 0;
   const hasContent = message.content.length > 0 || message.error;
@@ -69,7 +72,18 @@ export function ChatMessage({ message, isStreaming = false, onArtifactClick }: C
             }
           >
             {message.error ? (
-              <p className="text-destructive text-sm">{message.error}</p>
+              <div className="flex items-start gap-2">
+                <p className="text-destructive text-sm">{message.error}</p>
+                {onRetry && isRetryable(message.errorCode) && (
+                  <button
+                    onClick={onRetry}
+                    className="shrink-0 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mt-0.5"
+                  >
+                    <RefreshCw size={12} />
+                    Retry
+                  </button>
+                )}
+              </div>
             ) : (
               <>
                 <Markdown>{message.content}</Markdown>

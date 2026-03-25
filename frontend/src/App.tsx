@@ -26,7 +26,7 @@ export default function App() {
 
   const onConversationUpdate = useCallback(() => { refresh(); }, [refresh]);
 
-  const { messages, isStreaming, isLoadingHistory, sendMessage } = useChat(
+  const { messages, isStreaming, isLoadingHistory, sendMessage, retryLast } = useChat(
     {
       getDescriptors: artifactStore.getDescriptors,
       processArtifact: artifactStore.processArtifact,
@@ -88,7 +88,7 @@ export default function App() {
                 <p className="text-muted-foreground text-center mt-8">Loading conversation...</p>
               )}
               {messages.map((msg, i) => (
-                <ChatMessage key={i} message={msg} isStreaming={isStreaming && i === messages.length - 1} onArtifactClick={(id) => { artifactStore.setSelectedId(id); setWorkspaceCollapsed(false); }} />
+                <ChatMessage key={i} message={msg} isStreaming={isStreaming && i === messages.length - 1} onArtifactClick={(id) => { artifactStore.setSelectedId(id); setWorkspaceCollapsed(false); }} onRetry={msg.error && i === messages.length - 1 ? retryLast : undefined} />
               ))}
               <div ref={bottomRef} />
             </div>

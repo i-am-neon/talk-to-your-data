@@ -225,5 +225,13 @@ export function useChat(
     [conversationId, model, handleEvent]
   );
 
-  return { messages, isStreaming, isLoadingHistory, sendMessage };
+  const retryLast = useCallback(() => {
+    const lastUserIdx = messages.findLastIndex((m) => m.role === "user");
+    if (lastUserIdx === -1) return;
+    const question = messages[lastUserIdx].content;
+    setMessages((prev) => prev.slice(0, lastUserIdx));
+    sendMessage(question);
+  }, [messages, sendMessage]);
+
+  return { messages, isStreaming, isLoadingHistory, sendMessage, retryLast };
 }
