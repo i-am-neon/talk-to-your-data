@@ -41,8 +41,8 @@ Benchmarked all three models against 25 eval cases (10 functional + 15 red team 
 
 | Model | Pass Rate | Avg Latency | Cost (25 queries) |
 |-------|-----------|-------------|-------------------|
-| **Sonnet 4.6** | **100%** | 5.7s | $0.24 |
 | **Haiku 4.5** | **100%** | **3.7s** | **$0.09** |
+| **Sonnet 4.6** | **100%** | 5.7s | $0.24 |
 | **Opus 4.6** | **100%** | 6.1s | $0.41 |
 
 **Findings:** All three models pass every case — functional, edge-case, and security. Haiku is 2x faster and 4-5x cheaper than Sonnet/Opus. Default model is Sonnet for open-ended reasoning quality; Haiku is viable for cost-sensitive deployments.
