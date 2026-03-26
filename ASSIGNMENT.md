@@ -53,7 +53,7 @@ Can also create own dataset -- just include it in submission.
 ## LLM Proxy
 
 - **URL**: https://litellm-production-f079.up.railway.app/
-- **API Key**: ***REMOVED***
+- **API Key**: (redacted — see .env)
 
 ## Encouraged Tools
 
