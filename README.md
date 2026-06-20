@@ -1,6 +1,6 @@
 # Talk to Your Data
 
-**[▶ Watch the demo](https://www.loom.com/share/712eac8a08c84ab491be7dd7e1eed04c)** | **[API](https://genesis-take-home-production.up.railway.app/docs)**
+**[▶ Watch the demo](https://www.loom.com/share/712eac8a08c84ab491be7dd7e1eed04c)**
 
 Ask questions about a SaaS dataset in plain English. Get text, interactive charts, or sortable tables back. The agent writes pandas/matplotlib code, runs it in a sandboxed VM, and streams the result.
 
