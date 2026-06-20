@@ -5,7 +5,7 @@
 Ask questions about a SaaS dataset in plain English. Get text, interactive charts, or sortable tables back. The agent writes pandas/matplotlib code, runs it in a sandboxed VM, and streams the result.
 
 
-[![Talk to Your Data — demo video](https://cdn.loom.com/sessions/thumbnails/712eac8a08c84ab491be7dd7e1eed04c-303f7806b42610d9.jpg)](https://www.loom.com/share/712eac8a08c84ab491be7dd7e1eed04c)
+[![Talk to Your Data — ask a question, get a live chart back](docs/demo.png)](https://www.loom.com/share/712eac8a08c84ab491be7dd7e1eed04c)
 
 > ▶ Click to watch the full walkthrough (~4 min).
 
