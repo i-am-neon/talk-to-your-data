@@ -1,8 +1,13 @@
 # Talk to Your Data
 
-**[API](https://genesis-take-home-production.up.railway.app/docs)**
+**[▶ Watch the demo](https://www.loom.com/share/712eac8a08c84ab491be7dd7e1eed04c)** | **[API](https://genesis-take-home-production.up.railway.app/docs)**
 
 Ask questions about a SaaS dataset in plain English. Get text, interactive charts, or sortable tables back. The agent writes pandas/matplotlib code, runs it in a sandboxed VM, and streams the result.
+
+
+[![Talk to Your Data — demo video](https://cdn.loom.com/sessions/thumbnails/712eac8a08c84ab491be7dd7e1eed04c-303f7806b42610d9.gif)](https://www.loom.com/share/712eac8a08c84ab491be7dd7e1eed04c)
+
+> ▶ Click to watch the full walkthrough (~4 min).
 
 ## Stack
 
