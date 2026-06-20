@@ -17,7 +17,7 @@ Ask questions about a SaaS dataset in plain English. Get text, interactive chart
 | Backend | FastAPI + PydanticAI + PostgreSQL → Railway |
 | Sandbox | E2B Code Interpreter (Firecracker microVMs) |
 | LLM | Genesis LiteLLM Proxy (OpenAI-compatible) |
-| Observability | [Logfire](https://logfire-us.pydantic.dev/tommywilczek/genesis-take-home?last=300000) |
+| Observability | Logfire |
 | Evals | pydantic-evals |
 | CI | GitHub CLI |
 
