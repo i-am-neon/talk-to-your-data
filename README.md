@@ -1,6 +1,6 @@
 # Talk to Your Data
 
-**[Live App](https://genesis-take-home.vercel.app/)** | **[API](https://genesis-take-home-production.up.railway.app/docs)**
+**[API](https://genesis-take-home-production.up.railway.app/docs)**
 
 Ask questions about a SaaS dataset in plain English. Get text, interactive charts, or sortable tables back. The agent writes pandas/matplotlib code, runs it in a sandboxed VM, and streams the result.
 
